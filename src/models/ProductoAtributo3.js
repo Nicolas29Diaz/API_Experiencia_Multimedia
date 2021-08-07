@@ -1,0 +1,16 @@
+import { DataTypes } from "sequelize";
+import { sequelize } from "../database/database";
+
+const ProductoAtributo3 = sequelize.define(
+  "producto_atributo_3",
+  {
+    idProductoAtributo3: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+    },
+  },
+  { tableName: "producto_atributo_3", timestamps: false }
+);
+
+export default ProductoAtributo3;

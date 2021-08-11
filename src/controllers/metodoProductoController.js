@@ -1,7 +1,7 @@
 import MetodoProducto from "../models/MetodoProducto";
 
 export async function createMethodProduct(req, res){
-  const {idMetodoMP, idProductoMP} = req.params;
+  const {idMetodoMP, idProductoMP} = req.body;
   try {
     const metodoProducto = await MetodoProducto.create({
       idMetodoMP,

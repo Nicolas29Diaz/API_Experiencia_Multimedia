@@ -1,7 +1,7 @@
 import SubgrupoProducto from "../Models/SubgrupoProducto";
 
 export async function createSubgroupProduct(req, res){
-  const {idProductoC2SP, idSubgrupoSP} = req.params;
+  const {idProductoC2SP, idSubgrupoSP} = req.body;
   try {
     const subgrupoProducto = await SubgrupoProducto.create({
       idProductoC2SP,

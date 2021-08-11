@@ -2,7 +2,7 @@ import { sequelize } from "../database/database";
 import Subgrupo from "../Models/Subgrupo";
 
 export async function createSubgroup(req, res){
-  const {nombreSubgrupo, cantidadSubgrupo} = req.params;
+  const {nombreSubgrupo, cantidadSubgrupo} = req.body;
   try {
     const subgrupo = await Subgrupo.create({
       nombreSubgrupo,

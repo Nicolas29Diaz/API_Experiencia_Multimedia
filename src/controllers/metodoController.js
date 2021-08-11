@@ -1,7 +1,7 @@
 import Metodo from "../models/Metodo";
 
 export async function createMethod(req, res){
-  const {nombreMetodo} = req.params;
+  const {nombreMetodo} = req.body;
   try {
     const metodo = await Metodo.create({
       nombreMetodo

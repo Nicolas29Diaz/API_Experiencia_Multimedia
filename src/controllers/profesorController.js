@@ -1,6 +1,4 @@
 import { sequelize } from "../database/database";
-import Curso from "../Models/Curso";
-import Practica from "../Models/Practica";
 import Profesor from "../Models/Profesor";
 
 export async function insertTeacher(req, res){

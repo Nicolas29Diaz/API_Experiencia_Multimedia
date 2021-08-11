@@ -1,6 +1,38 @@
 import { sequelize } from "../database/database";
 import ProductoCorte2 from "../Models/ProductoCorte2";
 
+export async function createReferenceProductC2(req, res){
+  const {nombrePC2, variablePrincipalC2, toleranciaPC2, idGrupoEstudiantePC2} = req.body;
+  try {
+    const referenceProduct = await ProductoCorte2.create({
+      nombrePC2,
+      variablePrincipalC2,
+      toleranciaPC2,
+      idGrupoEstudiantePC2
+    },{fields:['nombrePC2','variablePrincipalC2','toleranciaPC2','idGrupoEstudiantePC2']});
+    console.log(referenceProduct);
+    res.json(referenceProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function createInspectionProductC2(req, res){
+  const {nombrePC2, variablePrincipalC2, variableSecundariaC2,idGrupoEstudiantePC2} = req.body;
+  try {
+    const inspectionProduct = await ProductoCorte2.create({
+      nombrePC2,
+      variablePrincipalC2,
+      variableSecundariaC2,
+      idGrupoEstudiantePC2
+    },{fields:['nombrePC2','variablePrincipalC2','variableSecundariaC2','idGrupoEstudiantePC2']});
+    console.log(inspectionProduct);
+    res.json(inspectionProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getAllProductsC2(req, res) {
   try {
     const productosCorte2 = await ProductoCorte2.findAll();

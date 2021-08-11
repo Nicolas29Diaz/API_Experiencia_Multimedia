@@ -1,6 +1,39 @@
 import { sequelize } from "../database/database";
 import ProductoCorte1 from "../Models/ProductoCorte1";
 
+export async function createReferenceProductC1(req, res){
+  const {nombrePC1, variablePrincipalC1, toleranciaPC1, unidadesPC1,idGrupoEstudiantePC1} = req.body;
+  try {
+    const referenceProduct = await ProductoCorte1.create({
+      nombrePC1,
+      variablePrincipalC1,
+      toleranciaPC1,
+      unidadesPC1,
+      idGrupoEstudiantePC1
+    },{fields:['nombrePC1','variablePrincipalC1','toleranciaPC1','unidadesPC1','idGrupoEstudiantePC1']});
+    console.log(referenceProduct);
+    res.json(referenceProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function createInspectionProductC1(req, res){
+  const {nombrePC1, variablePrincipalC1, variableSecundariaC1,idGrupoEstudiantePC1} = req.body;
+  try {
+    const inspectionProduct = await ProductoCorte1.create({
+      nombrePC1,
+      variablePrincipalC1,
+      variableSecundariaC1,
+      idGrupoEstudiantePC1
+    },{fields:['nombrePC1','variablePrincipalC1','variableSecundariaC1','idGrupoEstudiantePC1']});
+    console.log(inspectionProduct);
+    res.json(inspectionProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getAllProductsC1(req, res) {
   try {
     const productosCorte1 = await ProductoCorte1.findAll();
@@ -25,9 +58,9 @@ export async function getOneProductC1(req, res) {
 }
 
 export async function getPracticeOneProductInfoPerGroup(req, res){
-  const {nombreGrupo} = req.params
+  const {idPractica, nombreGrupo} = req.params
   try {
-    const practiceProductsInfo = await sequelize.query(`select p.nombrePC1,p.variablePrincipalC1,p.toleranciaPC1,p.unidadesPC1 from producto_corte_1 p, grupo_estudiante ge, grupo g where p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.nombreGrupo='${nombreGrupo}' group by p.nombrePC1;`,{ type: sequelize.QueryTypes.SELECT })
+    const practiceProductsInfo = await sequelize.query(`select p.nombrePC1,p.variablePrincipalC1,p.toleranciaPC1,p.unidadesPC1 from producto_corte_1 p, grupo_estudiante ge, grupo g, practica pa where p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and g.nombreGrupo='${nombreGrupo}' group by p.nombrePC1;`,{ type: sequelize.QueryTypes.SELECT })
     console.log(practiceProductsInfo);
     res.json(practiceProductsInfo);
   } catch (error) {

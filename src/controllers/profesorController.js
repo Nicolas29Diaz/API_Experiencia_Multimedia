@@ -3,6 +3,21 @@ import Curso from "../Models/Curso";
 import Practica from "../Models/Practica";
 import Profesor from "../Models/Profesor";
 
+export async function insertTeacher(req, res){
+  const {idProfesor, nombreProfesor, apellidoProfesor} = req.body;
+  try {
+    const profesor = await Profesor.create({
+      idProfesor,
+      nombreProfesor,
+      apellidoProfesor
+    },{fields:['idProfesor','nombreProfesor','apellidoProfesor']});
+    console.log(profesor);
+    res.json(profesor);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getAllTeachers(req, res) {
   try {
     const teachers = await Profesor.findAll();

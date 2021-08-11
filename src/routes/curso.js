@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  insertCourse,
   getAllCourses,
   getOneCourse,
   getCourseByTeacher,
@@ -9,11 +10,14 @@ import {
 
 const router = Router();
 
+// Inserciones
+router.post("/", insertCourse);
+
+// Consultas
 // /api/curso
 router.get("/", getAllCourses);
+// Obetener la información de un curso
 router.get("/:idCurso", getOneCourse);
-
-// api/curso/profesor/idProfesor
 // Conocer que cursos pertenecen a un profesor
 router.get("/profesor/:idProfesorC", getCourseByTeacher);
 // Conocer que practicas tiene asignadas un curso especifico:

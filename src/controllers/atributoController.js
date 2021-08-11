@@ -1,5 +1,18 @@
 import Atributo from "../Models/Atributo";
 
+export async function createAtribute(req, res) {
+  const { nombreAtributo } = req.body;
+  try {
+    const atributo = await Atributo.create({
+      nombreAtributo
+    },{fields:['nombreAtributo']})
+    console.log(atributo);
+    res.json(atributo);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getAllAtributes(req, res) {
   try {
     const atributos = await Atributo.findAll();

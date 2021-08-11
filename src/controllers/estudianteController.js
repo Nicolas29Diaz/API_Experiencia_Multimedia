@@ -1,9 +1,20 @@
 import { sequelize } from "../database/database";
-import Curso from "../Models/Curso";
 import Estudiante from "../models/Estudiante";
-import Grupo from "../Models/Grupo";
-import GrupoEstudiante from "../Models/GrupoEstudiante";
-import Practica from "../Models/Practica";
+
+export async function insertStudent(req, res){
+  const {idEstudiante, nombreEstudiante, apellidoEstudiante} = req.body;
+  try {
+    const estudiante = await Estudiante.create({
+      idEstudiante,
+      nombreEstudiante,
+      apellidoEstudiante
+    },{fields:['idEstudiante','nombreEstudiante','apellidoEstudiante']});
+    console.log(estudiante);
+    res.json(estudiante);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export async function getAllStudents(req, res) {
   try {

@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+  createSubgroup,
   getAllSubgroups,
   getOneSubgroup,
   getSubgroupSize,
@@ -8,6 +9,10 @@ import {
 } from "../controllers/subgrupoController";
 const router = Router();
 
+// Inserciones
+router.post("/", createSubgroup);
+
+// Consultas
 // /api/subgrupo
 router.get("/", getAllSubgroups);
 router.get("/:idSubgrupo", getOneSubgroup);

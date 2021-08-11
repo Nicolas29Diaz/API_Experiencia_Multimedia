@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { getAllStudents, getOneStudent, getGroupPerPractice } from "../controllers/estudianteController";
+import {insertStudent, getAllStudents, getOneStudent, getGroupPerPractice } from "../controllers/estudianteController";
 
 const router = Router();
 
+// Inserciones
+router.post("/", insertStudent);
+
+// Consultas
 router.get("/", getAllStudents);
 // Consultar informacion de un estudiante
 router.get("/:idEstudiante", getOneStudent);

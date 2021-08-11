@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { getAllGrafico } from "../controllers/graficoController";
+import { createGraphic, getAllGraphics } from "../controllers/graficoController";
 
 const router = Router();
 
+// Inserciones
+router.post("/", createGraphic);
+
+// Consultas
 //api/grafico
-router.get("/", getAllGrafico);
+router.get("/", getAllGraphics);
 
 export default router;

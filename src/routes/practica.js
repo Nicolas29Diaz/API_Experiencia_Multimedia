@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  createPractice,
   getAllPractica,
   getPracticeStudentsPerGroup,
   getStudentsPerGroup,
@@ -12,6 +13,10 @@ import {
 } from "../controllers/practicaController";
 const router = Router();
 
+// Inserciones
+router.post("/", createPractice);
+
+// Consultas
 // api/practica
 router.get("/", getAllPractica);
 // Conocer el nombre de los estudiantes de cada grupo para una determinada practica:

@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { getAllMethods } from "../controllers/metodoController";
+import { createMethod, getAllMethods } from "../controllers/metodoController";
 
 const router = Router();
 
+// Inserciones
+router.post("/", createMethod);
+
+// Consultas
 // /api/metodo
 router.get("/", getAllMethods);
 

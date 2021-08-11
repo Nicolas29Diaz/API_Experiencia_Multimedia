@@ -1,6 +1,21 @@
 import { sequelize } from "../database/database";
 import Curso from "../Models/Curso";
 
+export async function insertCourse(req, res){
+  const {nombreCurso, periodoAcademico,idProfesorC} = req.body;
+  try {
+    const curso = await Curso.create({
+      nombreCurso,
+      periodoAcademico,
+      idProfesorC
+    },{fields:['nombreCurso','periodoAcademico','idProfesorC']});
+    console.log(curso);
+    res.json(curso);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getAllCourses(req, res) {
   try {
     const cursos = await Curso.findAll();

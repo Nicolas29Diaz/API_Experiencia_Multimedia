@@ -1,6 +1,91 @@
 import { sequelize } from "../database/database";
 import ProductoCorte3 from "../models/ProductoCorte3";
 
+// Crear productos cuando el tipo de muestreo es por atributos
+export async function createReferenceProductC3TypeA(req, res){
+  const {nombrePC3, tamanioLote, aql, severidad, nivelInspeccion,idGrupoEstudiantePC3} = req.body;
+  try {
+    const referenceProduct = await ProductoCorte3.create({
+      nombrePC3,
+      tamanioLote,
+      aql,
+      severidad,
+      nivelInspeccion,
+      idGrupoEstudiantePC3
+    },{fields:['nombrePC3','tamanioLote','aql','severidad','nivelInspeccion','idGrupoEstudiantePC3']});
+    console.log(referenceProduct);
+    res.json(referenceProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function createInspectionProductC3TypeA(req, res){
+  const {nombrePC3,idGrupoEstudiantePC3} = req.body;
+  try {
+    const inspectionProduct = await ProductoCorte3.create({
+      nombrePC3,
+      idGrupoEstudiantePC3
+    },{fields:['nombrePC3','idGrupoEstudiantePC3']});
+    console.log(inspectionProduct);
+    res.json(inspectionProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Crear productos cuando el tipo de muestreo es por variables
+export async function createReferenceProductC3TypeV(req, res){
+  const {nombrePC3, variablePrincipalC3, toleranciaPC3, tamanioLote, aql, severidad, nivelInspeccion,idGrupoEstudiantePC3} = req.body;
+  try {
+    const referenceProduct = await ProductoCorte3.create({
+      nombrePC3,
+      variablePrincipalC3,
+      toleranciaPC3,
+      tamanioLote,
+      aql,
+      severidad,
+      nivelInspeccion,
+      idGrupoEstudiantePC3
+    },{fields:['nombrePC3','variablePrincipalC3','toleranciaPC3','tamanioLote','aql','severidad','nivelInspeccion','idGrupoEstudiantePC3']});
+    console.log(referenceProduct);
+    res.json(referenceProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function createInspectionProductC3TypeV(req, res){
+  const {nombrePC3, variablePrincipalC3, variableSecundariaC3,idGrupoEstudiantePC3} = req.body;
+  try {
+    const inspectionProduct = await ProductoCorte3.create({
+      nombrePC3,
+      variablePrincipalC3,
+      variableSecundariaC3,
+      idGrupoEstudiantePC3
+    },{fields:['nombrePC3','variablePrincipalC3','variableSecundariaC3','idGrupoEstudiantePC3']});
+    console.log(inspectionProduct);
+    res.json(inspectionProduct);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// export async function createInspectionProductC3TypeV2(req, res){
+//   const {nombrePC3, variablePrincipalC3, idGrupoEstudiantePC3} = req.body;
+//   try {
+//     const inspectionProduct = await ProductoCorte3.create({
+//       nombrePC3,
+//       variablePrincipalC3,
+//       idGrupoEstudiantePC3
+//     },{fields:['nombrePC3','variablePrincipalC3','idGrupoEstudiantePC3']});
+//     console.log(inspectionProduct);
+//     res.json(inspectionProduct);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
 export async function getAllProductsC3(req, res) {
   try {
     const productosCorte3 = await ProductoCorte3.findAll();

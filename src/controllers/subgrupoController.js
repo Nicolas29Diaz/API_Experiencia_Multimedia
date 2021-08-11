@@ -1,6 +1,20 @@
 import { sequelize } from "../database/database";
 import Subgrupo from "../Models/Subgrupo";
 
+export async function createSubgroup(req, res){
+  const {nombreSubgrupo, cantidadSubgrupo} = req.params;
+  try {
+    const subgrupo = await Subgrupo.create({
+      nombreSubgrupo,
+      cantidadSubgrupo
+    },{fields:['nombreSubgrupo', 'cantidadSubgrupo']});
+    console.log(subgrupo);
+    res.json(subgrupo);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getAllSubgroups(req, res) {
   try {
     const subgrupos = await Subgrupo.findAll();

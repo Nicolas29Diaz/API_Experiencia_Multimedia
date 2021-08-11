@@ -1,12 +1,17 @@
 import { Router } from "express";
 
 import {
+  insertTeacher,
   getAllTeachers,
   getOneTeacher,
   getPracticeAndModuleByTeacher,
 } from "../controllers/profesorController";
 const router = Router();
 
+// Inserciones
+router.post("/", insertTeacher);
+
+// Consultas
 // /api/profesor
 router.get("/", getAllTeachers);
 // Conocer la informacion de un profesor especifico

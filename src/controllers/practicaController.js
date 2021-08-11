@@ -1,6 +1,23 @@
 import { sequelize } from "../database/database";
 import Practica from "../models/Practica";
 
+export async function createPractice(req, res){
+  const {nombrePractica, descripcionPractica, fechaHoraPublicacionPractica,idCursoP, idCorteP} = req.body;
+  try {
+    const practica = await Practica.create({
+      nombrePractica,
+      descripcionPractica,
+      fechaHoraPublicacionPractica,
+      idCursoP,
+      idCorteP
+    },{fields:['nombrePractica','descripcionPractica','fechaHoraPublicacionPractica','idCursoP','idCorteP']});
+    console.log(practica);
+    res.json(practica);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getAllPractica(req, res) {
   try {
     const practicas = await Practica.findAll();

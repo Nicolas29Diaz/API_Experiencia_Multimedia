@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { getAllGraficoPracticas } from "../controllers/graficoPracticaController";
+import { createGraphicPractice, getAllGraphicPractice } from "../controllers/graficoPracticaController";
 
 const router = Router();
 
+// Inserciones
+router.post("/", createGraphicPractice);
+
+// Consultas
 //api/graficopractica
-router.get("/", getAllGraficoPracticas);
+router.get("/", getAllGraphicPractice);
 
 export default router;

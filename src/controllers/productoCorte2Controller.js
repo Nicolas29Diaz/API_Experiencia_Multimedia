@@ -59,7 +59,7 @@ export async function getOneProductC2(req, res) {
 export async function getPracticeTwoProductInfoPerGroup(req, res){
   const {nombreGrupo, idPractica} = req.params
   try {
-    const practiceProductsInfo = await sequelize.query(`select p.nombrePC2, count(s.idSubgrupo),s.cantidadSubgrupo,p.variablePrincipalC2,p.toleranciaPC2 from subgrupo s, subgrupo_producto sp, producto_corte_2 p, grupo_estudiante ge, grupo g, practica pa where s.idSubgrupo=sp.idSubgrupoSP and sp.idProductoC2SP=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and g.nombreGrupo='${nombreGrupo}' and pa.idPractica=${idPractica};`)
+    const practiceProductsInfo = await sequelize.query(`select p.nombrePC2, count(s.idSubgrupo),s.cantidadSubgrupo,p.variablePrincipalC2,p.toleranciaPC2 from subgrupo s, subgrupo_producto sp, producto_corte_2 p, grupo_estudiante ge, grupo g, practica pa where s.idSubgrupo=sp.idSubgrupoSP and sp.idProductoC2SP=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and g.nombreGrupo='${nombreGrupo}' and pa.idPractica=${idPractica};`,{ type: sequelize.QueryTypes.SELECT })
     console.log(practiceProductsInfo);
     res.json(practiceProductsInfo);
   } catch (error) {
@@ -68,9 +68,9 @@ export async function getPracticeTwoProductInfoPerGroup(req, res){
 }
 
 export async function getPracticeTwoProductAtributesPerGroup(req, res){
-  const {nombreGrupo} = req.params;
+  const {nombreGrupo, idPractica} = req.params;
   try {
-    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_2 pa, producto_corte_2 p, grupo_estudiante ge, grupo g where a.idAtributo=pa.idAtributoPA2 and pa.idProductoC2A=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.nombreGrupo='${nombreGrupo}' group by a.nombreAtributo;`)
+    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_2 pra, producto_corte_2 p, grupo_estudiante ge, grupo g, practica pa where a.idAtributo=pra.idAtributoPA2 and pra.idProductoC2A=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and g.nombreGrupo='${nombreGrupo}' and pa.idPractica=${idPractica} group by a.nombreAtributo;`,{ type: sequelize.QueryTypes.SELECT })
     console.log(productAtributes);
     res.json(productAtributes);
   } catch (error) {
@@ -81,7 +81,7 @@ export async function getPracticeTwoProductAtributesPerGroup(req, res){
 export async function getProductInfoPerSubgroupAndStudent(req, res){
   const {idPractica, idEstudiante, nombreSubgrupo} = req.params;
   try {
-    const productInfoPerSubgroupAndStudent = await sequelize.query(`select p.nombrePC2,p.variablePrincipalC2,p.variableSecundariaC2 from subgrupo s, subgrupo_producto sp, producto_corte_2 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where s.idSubgrupo=sp.idSubgrupoSP and sp.idProductoC2SP=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and s.nombreSubgrupo='${nombreSubgrupo}' and e.idEstudiante=${idEstudiante};`);
+    const productInfoPerSubgroupAndStudent = await sequelize.query(`select p.nombrePC2,p.variablePrincipalC2,p.variableSecundariaC2 from subgrupo s, subgrupo_producto sp, producto_corte_2 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where s.idSubgrupo=sp.idSubgrupoSP and sp.idProductoC2SP=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and s.nombreSubgrupo='${nombreSubgrupo}' and e.idEstudiante=${idEstudiante};`,{ type: sequelize.QueryTypes.SELECT });
     console.log(productInfoPerSubgroupAndStudent);
     res.json(productInfoPerSubgroupAndStudent);
   } catch (error) {
@@ -92,7 +92,7 @@ export async function getProductInfoPerSubgroupAndStudent(req, res){
 export async function getPracticeTwoProductAtributes(req, res){
   const {idProductoC2} = req.params
   try {
-    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_2 pa, producto_corte_2 p where a.idAtributo=pa.idAtributoPA2 and pa.idProductoC2A=p.idProductoC2 and p.idProductoC2=${idProductoC2};`)
+    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_2 pa, producto_corte_2 p where a.idAtributo=pa.idAtributoPA2 and pa.idProductoC2A=p.idProductoC2 and p.idProductoC2=${idProductoC2};`,{ type: sequelize.QueryTypes.SELECT })
     console.log(productAtributes);
     res.json(productAtributes);
   } catch (error) {

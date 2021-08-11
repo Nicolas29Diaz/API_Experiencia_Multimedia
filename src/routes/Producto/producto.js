@@ -16,7 +16,7 @@ router.get("/corte1", getAllProductsC1);
 // Conocer la informacion de un producto de acuerdo al grupo al que fue asignado:
 router.get("/corte1/:idPractica/:nombreGrupo", getPracticeOneProductInfoPerGroup);
 // Conocer los atributos asignados al producto de un grupo especifico:
-router.get("/corte1/atributos/grupo/:nombreGrupo", getPracticeOneProductAtributesPerGroup);//Toca agregar el id de la practica
+router.get("/corte1/atributos/grupo/:nombreGrupo/:idPractica", getPracticeOneProductAtributesPerGroup);//Toca agregar el id de la practica
 // Conocer los productos que tuvo/tiene que inspeccionar un estudiante especifico:
 router.get("/corte1/inspeccion/estudiante/:idEstudiante", getPracticeOneProductPerStudent);
 // Consultar toda la informacion de los productos asignados a un estudiante especifico (incluyendo los atributos)
@@ -35,7 +35,7 @@ router.get("/corte2", getAllProductsC2);
 // Conocer la informacion de un producto de acuerdo al grupo al que fue asignado:
 router.get("/corte2/:idPractica/:nombreGrupo", getPracticeTwoProductInfoPerGroup);
 // Conocer los atributos asignados al producto de un grupo especifico:
-router.get("/corte2/atributos/grupo/:nombreGrupo", getPracticeTwoProductAtributesPerGroup);
+router.get("/corte2/atributos/grupo/:nombreGrupo/:idPractica", getPracticeTwoProductAtributesPerGroup);
 // Conocer la informacion de los productos pertenecientes a un subgrupo especifico de un estudiante especifico para una practica determinada:
 router.get("/corte2/inspeccion/:idPractica/:idEstudiante/:nombreSubgrupo", getProductInfoPerSubgroupAndStudent);
 // Consultar los atributos de un determinado producto especifico:
@@ -56,7 +56,7 @@ router.get("/corte3", getAllProductsC3);
 // Conocer la informacion de un producto de acuerdo al grupo al que fue asignado:
 router.get("/corte3/:idPractica/:nombreGrupo", getPracticeThreeProductInfoPerGroup);
 // Conocer los atributos asignados al producto de un grupo especifico:
-router.get("/corte3/atributos/grupo/:nombreGrupo", getPracticeThreeProductAtributesPerGroup);
+router.get("/corte3/atributos/grupo/:nombreGrupo/:idPractica", getPracticeThreeProductAtributesPerGroup);
 // Conocer los productos que tuvo/tiene que inspeccionar un estudiante especifico:
 router.get("/corte3/inspeccion/estudiante/:idEstudiante", getPracticeThreeProductPerStudent);
 // Consultar toda la informacion de los productos asignados a un estudiante especifico (incluyendo atributos)

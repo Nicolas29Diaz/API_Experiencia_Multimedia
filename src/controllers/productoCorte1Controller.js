@@ -69,9 +69,9 @@ export async function getPracticeOneProductInfoPerGroup(req, res){
 }
 
 export async function getPracticeOneProductAtributesPerGroup(req, res){
-  const {nombreGrupo} = req.params
+  const {nombreGrupo, idPractica} = req.params
   try {
-    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_1 pa, producto_corte_1 p, grupo_estudiante ge, grupo g where a.idAtributo=pa.idAtributoPA1 and pa.idProductoC1A=p.idProductoC1 and p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.nombreGrupo='${nombreGrupo}' group by a.nombreAtributo;`,{ type: sequelize.QueryTypes.SELECT })
+    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_1 pra, producto_corte_1 p, grupo_estudiante ge, grupo g, practica pa where a.idAtributo=pra.idAtributoPA1 and pra.idProductoC1A=p.idProductoC1 and p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and g.nombreGrupo='${nombreGrupo}' and pa.idPractica=${idPractica} group by a.nombreAtributo;`,{ type: sequelize.QueryTypes.SELECT })
     console.log(productAtributes);
     res.json(productAtributes);
   } catch (error) {

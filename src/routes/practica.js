@@ -27,7 +27,7 @@ router.get("/grupo/:idPractica/:nombreGrupo", getStudentsPerGroup);
 router.get("/integrantes/:idPractica", getStudentCountPerGroup);
 // Conocer que producto se le asigno a cada grupo para una determinada practica del corte 1:
 router.get("/producto1/:idPractica", getPracticeOneProductPerGroup);
-// Conocer el nombre de los graficos que se han seleccionado para una practica segun su nombre:
+// Conocer el nombre de los graficos que se han seleccionado para una practica segun su id:
 router.get("/graficos/:idPractica", getPracticeGraphics);
 // Conocer que producto se le asigno a cada grupo para una determinada practica del corte 2:
 router.get("/producto2/:idPractica", getPracticeTwoProductPerGroup);

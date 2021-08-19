@@ -9,7 +9,7 @@ import {
   getPracticeGraphics,
   getPracticeTwoProductPerGroup,
   getPracticeThreeProductPerGroup,
-  getPracticeThreeGroupMethods
+  getPracticeThreeGroupMethods,
 } from "../controllers/practicaController";
 const router = Router();
 

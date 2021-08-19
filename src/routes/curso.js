@@ -5,7 +5,8 @@ import {
   getOneCourse,
   getCourseByTeacher,
   getPracticePerCourse,
-  getStudentCourse
+  getStudentCourse,
+  getCourseStudent,
 } from "../controllers/cursoController";
 
 const router = Router();
@@ -24,5 +25,7 @@ router.get("/profesor/:idProfesorC", getCourseByTeacher);
 router.get("/practica/:idCurso", getPracticePerCourse);
 // Conocer a que curso pertenece un estudiante especifico:
 router.get("/estudiante/:idEstudiante", getStudentCourse);
+// Conocer que estudiantes pertencen a un curso
+router.get("/curso/:idCurso", getCourseStudent);
 
 export default router;

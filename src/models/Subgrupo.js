@@ -5,7 +5,12 @@ import SubgrupoProducto from "./SubgrupoProducto";
 const Subgrupo = sequelize.define(
   "subgrupo",
   {
-    idSubgrupo: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idSubgrupo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     nombreSubgrupo: { type: DataTypes.STRING(25), allowNull: false },
     cantidadSubgrupo: { type: DataTypes.INTEGER, allowNull: false },
   },

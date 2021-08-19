@@ -5,7 +5,12 @@ import GrupoEstudiante from "./GrupoEstudiante";
 const Grupo = sequelize.define(
   "grupo",
   {
-    idGrupo: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idGrupo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     nombreGrupo: { type: DataTypes.STRING(50), allowNull: false },
     idPracticaG: {
       type: DataTypes.INTEGER,

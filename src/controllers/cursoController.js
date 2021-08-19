@@ -1,14 +1,17 @@
 import { sequelize } from "../database/database";
 import Curso from "../Models/Curso";
 
-export async function insertCourse(req, res){
-  const {nombreCurso, periodoAcademico,idProfesorC} = req.body;
+export async function insertCourse(req, res) {
+  const { nombreCurso, periodoAcademico, idProfesorC } = req.body;
   try {
-    const curso = await Curso.create({
-      nombreCurso,
-      periodoAcademico,
-      idProfesorC
-    },{fields:['nombreCurso','periodoAcademico','idProfesorC']});
+    const curso = await Curso.create(
+      {
+        nombreCurso,
+        periodoAcademico,
+        idProfesorC,
+      },
+      { fields: ["nombreCurso", "periodoAcademico", "idProfesorC"] }
+    );
     console.log(curso);
     res.json(curso);
   } catch (error) {
@@ -52,10 +55,13 @@ export async function getCourseByTeacher(req, res) {
   }
 }
 
-export async function getPracticePerCourse(req, res){
-  const {idCurso} = req.params;
+export async function getPracticePerCourse(req, res) {
+  const { idCurso } = req.params;
   try {
-    const practiceCourse = await sequelize.query(`select pa.nombrePractica from practica pa, curso c where pa.idCursoP=c.idCurso and c.idCurso=${idCurso};`,{ type: sequelize.QueryTypes.SELECT });
+    const practiceCourse = await sequelize.query(
+      `select pa.nombrePractica from practica pa, curso c where pa.idCursoP=c.idCurso and c.idCurso=${idCurso};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
     console.log(practiceCourse);
     res.json(practiceCourse);
   } catch (error) {
@@ -63,13 +69,29 @@ export async function getPracticePerCourse(req, res){
   }
 }
 
-export async function getStudentCourse(req, res){
-  const {idEstudiante} = req.params;
-  try{
-    const studentCourse = await sequelize.query(`select c.nombreCurso from curso c, practica pa, grupo g, grupo_estudiante ge, estudiante e where c.idCurso=pa.idCursoP and pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and ge.idEstudianteGE=e.idEstudiante and e.idEstudiante=${idEstudiante} group by c.nombreCurso;`,{ type: sequelize.QueryTypes.SELECT })
+export async function getStudentCourse(req, res) {
+  const { idEstudiante } = req.params;
+  try {
+    const studentCourse = await sequelize.query(
+      `select c.nombreCurso from curso c, practica pa, grupo g, grupo_estudiante ge, estudiante e where c.idCurso=pa.idCursoP and pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and ge.idEstudianteGE=e.idEstudiante and e.idEstudiante=${idEstudiante} group by c.nombreCurso;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
     console.log(studentCourse);
-    res.json(studentCourse)
-  }catch(e){
+    res.json(studentCourse);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function getCourseStudent(req, res) {
+  const { idCurso } = req.params;
+  try {
+    const studentCourse = await sequelize.query(
+      `select e.idEstudiante as id, CONCAT(e.nombreEstudiante ,' ', e.apellidoEstudiante) as estudiante from curso c, practica pa, grupo g, grupo_estudiante ge, estudiante e where c.idCurso=pa.idCursoP and pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and ge.idEstudianteGE=e.idEstudiante and c.idCurso=${idCurso} group by e.nombreEstudiante;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    res.json(studentCourse);
+  } catch (e) {
     console.log(e);
   }
 }

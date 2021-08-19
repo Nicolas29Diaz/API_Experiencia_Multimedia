@@ -6,7 +6,12 @@ import Grupo from "./Grupo";
 const Practica = sequelize.define(
   "practica",
   {
-    idPractica: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idPractica: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     nombrePractica: { type: DataTypes.STRING(100), allowNull: false },
     descripcionPractica: { type: DataTypes.TEXT, allowNull: false },
     fechaHoraPublicacionPractica: { type: DataTypes.DATE, allowNull: false },

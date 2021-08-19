@@ -10,6 +10,7 @@ const GrupoEstudiante = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
     fechaHoraGrupoEstudiante: { type: DataTypes.DATE, allowNull: false },
     idGrupoGE: {
@@ -24,24 +25,24 @@ const GrupoEstudiante = sequelize.define(
   { tableName: "grupo_estudiante", timestamps: false }
 );
 
-GrupoEstudiante.hasMany(ProductoCorte1,{
+GrupoEstudiante.hasMany(ProductoCorte1, {
   foreignKey: "idGrupoEstudiantePC1",
-  sourceKey:"idGrupoEstudiante"
-})
+  sourceKey: "idGrupoEstudiante",
+});
 
-ProductoCorte1.belongsTo(GrupoEstudiante,{
+ProductoCorte1.belongsTo(GrupoEstudiante, {
   foreignKey: "idGrupoEstudiantePC1",
-  sourceKey:"idGrupoEstudiante"
-})
+  sourceKey: "idGrupoEstudiante",
+});
 
-GrupoEstudiante.hasMany(ProductoCorte2,{
+GrupoEstudiante.hasMany(ProductoCorte2, {
   foreignKey: "idGrupoEstudiantePC2",
-  sourceKey:"idGrupoEstudiante"
-})
+  sourceKey: "idGrupoEstudiante",
+});
 
-ProductoCorte2.belongsTo(GrupoEstudiante,{
+ProductoCorte2.belongsTo(GrupoEstudiante, {
   foreignKey: "idGrupoEstudiantePC2",
-  sourceKey:"idGrupoEstudiante"
-})
+  sourceKey: "idGrupoEstudiante",
+});
 
 export default GrupoEstudiante;

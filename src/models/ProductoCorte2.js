@@ -10,6 +10,7 @@ const ProductoCorte2 = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
     nombrePC2: { type: DataTypes.STRING(25), allowNull: false },
     variablePrincipalC2: { type: DataTypes.INTEGER, allowNull: false },

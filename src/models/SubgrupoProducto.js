@@ -8,6 +8,7 @@ const SubgrupoProducto = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
   },
   { tableName: "subgrupo_producto", timestamps: false }

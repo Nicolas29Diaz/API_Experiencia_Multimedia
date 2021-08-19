@@ -5,7 +5,12 @@ import MetodoProducto from "./MetodoProducto";
 const Metodo = sequelize.define(
   "metodo",
   {
-    idMetodo: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idMetodo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     nombreMetodo: { type: DataTypes.STRING(20), allowNull: false },
   },
   { tableName: "metodo", timestamps: false }

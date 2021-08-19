@@ -1,6 +1,6 @@
 import express, { json } from "express";
 import morgan from "morgan";
-
+import cors from "cors";
 // Importing routes
 import cursoRoutes from "./routes/curso";
 import profesorRoutes from "./routes/profesor";
@@ -24,10 +24,11 @@ const app = express();
 // Middlewares
 app.use(morgan("dev"));
 app.use(json());
+app.use(cors());
 
 // routes
 app.use("/api/profesor", profesorRoutes);
-app.use("/api/curso", cursoRoutes);
+app.use("/api/cursos", cursoRoutes);
 app.use("/api/practica", practicaRoutes);
 app.use("/api/corte", corteRoutes);
 app.use("/api/grafico", graficoRoutes);

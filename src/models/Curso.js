@@ -5,7 +5,12 @@ import Practica from "./Practica";
 const Curso = sequelize.define(
   "curso",
   {
-    idCurso: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idCurso: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     nombreCurso: { type: DataTypes.STRING(25), allowNull: false },
     periodoAcademico: { type: DataTypes.STRING(25), allowNull: false },
     idProfesorC: {

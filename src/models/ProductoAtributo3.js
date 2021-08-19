@@ -8,7 +8,10 @@ const ProductoAtributo3 = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
+    idAtributoPA3: { type: DataTypes.INTEGER, allowNull: false },
+    idProductoC3A: { type: DataTypes.INTEGER, allowNull: false },
   },
   { tableName: "producto_atributo_3", timestamps: false }
 );

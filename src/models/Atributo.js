@@ -6,7 +6,12 @@ import ProductoAtributo2 from "./ProductoAtributo2";
 const Atributo = sequelize.define(
   "atributo",
   {
-    idAtributo: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idAtributo: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     nombreAtributo: { type: DataTypes.STRING(50), allowNull: false },
   },
   { tableName: "atributo", timestamps: false }

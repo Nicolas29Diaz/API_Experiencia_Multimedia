@@ -10,6 +10,8 @@ const SubgrupoProducto = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    idProductoC2SP: { type: DataTypes.INTEGER, allowNull: false },
+    idSubgrupoSP: { type: DataTypes.INTEGER, allowNull: false },
   },
   { tableName: "subgrupo_producto", timestamps: false }
 );

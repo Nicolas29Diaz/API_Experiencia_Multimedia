@@ -3,10 +3,15 @@ import Grupo from "../models/Grupo";
 import Practica from "../models/Practica";
 import { getRandomMinMax } from "../helpers";
 import GrupoEstudiante from "../models/GrupoEstudiante";
+import GraficoPractica from "../models/GraficoPractica";
 import ProductoAtributo1 from "../models/ProductoAtributo1";
+import ProductoAtributo2 from "../models/ProductoAtributo2";
 import ProductoCorte1 from "../models/ProductoCorte1";
+import ProductoCorte2 from "../models/ProductoCorte2";
+import Subgrupo from "../Models/Subgrupo";
+import SubgrupoProducto from "../models/SubgrupoProducto";
 
-export async function createPractice(req, res) {
+export async function createPractice1(req, res) {
   try {
     const {
       field: { nombrePractica, descripcion, modulo },
@@ -88,6 +93,127 @@ export async function createPractice(req, res) {
     res.status(200).json("Practica creada con exito");
   } catch (error) {
     res.status(500).json("Algo salió mal");
+    console.log(error);
+  }
+}
+
+export async function createPractice2(req, res) {
+  try {
+    const {
+      field: {
+        nombrePractica,
+        descripcion,
+        modulo: { value },
+        graficos,
+      },
+      groups: { group, numGrupo },
+    } = req.body;
+
+    const practica = await Practica.create(
+      {
+        nombrePractica,
+        descripcionPractica: descripcion,
+        idCorteP: value,
+        idCursoP: 2,
+      },
+      {
+        fields: [
+          "nombrePractica",
+          "descripcionPractica",
+          "idCorteP",
+          "idCursoP",
+        ],
+      }
+    );
+
+    for (let graphic = 0; graphic < graficos.length; graphic++) {
+      await GraficoPractica.create(
+        {
+          idPracticaGP: practica.dataValues.idPractica,
+          idGraficoGP: graficos[graphic].value,
+        },
+        { fields: ["idPracticaGP", "idGraficoGP"] }
+      );
+    }
+
+    for (let i = 0; i < numGrupo.value; i++) {
+      const {
+        producto,
+        subgrupo,
+        tamanioSubgrupo,
+        tolerancia,
+        integrantes,
+        cont,
+        atributos,
+      } = group[i];
+      const nombreGrupo = `Grupo ${i + 1}`;
+
+      const grupo = await Grupo.create(
+        {
+          nombreGrupo,
+          idPracticaG: practica.dataValues.idPractica,
+        },
+        { fields: ["nombreGrupo", "idPracticaG"] }
+      );
+
+      for (let j = 0; j < integrantes.length; j++) {
+        const grupoEstudiante = await GrupoEstudiante.create(
+          {
+            idGrupoGE: grupo.dataValues.idGrupo,
+            idEstudianteGE: integrantes[j].id,
+          },
+          { fields: ["idGrupoGE", "idEstudianteGE"] }
+        );
+
+        const referenceProduct = await ProductoCorte2.create(
+          {
+            nombrePC2: producto.label,
+            variablePrincipalC2: cont.value,
+            toleranciaPC2: tolerancia,
+            idGrupoEstudiantePC2: grupoEstudiante.dataValues.idGrupoEstudiante,
+          },
+          {
+            fields: [
+              "nombrePC2",
+              "variablePrincipalC2",
+              "toleranciaPC2",
+              "idGrupoEstudiantePC2",
+            ],
+          }
+        );
+
+        for (let attribute = 0; attribute < atributos.length; attribute++) {
+          await ProductoAtributo2.create(
+            {
+              idAtributoPA2: atributos[attribute].value,
+              idProductoC2A: referenceProduct.dataValues.idProductoC2,
+            },
+            { fields: ["idAtributoPA2", "idProductoC2A"] }
+          );
+        }
+
+        for (let s = 0; s < subgrupo; s++) {
+          const createSubgroup = await Subgrupo.create(
+            {
+              nombreSubgrupo: `Subgrupo ${s + 1}`,
+              cantidadSubgrupo: tamanioSubgrupo,
+            },
+            { fields: ["nombreSubgrupo", "cantidadSubgrupo"] }
+          );
+
+          await SubgrupoProducto.create(
+            {
+              idProductoC2SP: referenceProduct.dataValues.idProductoC2,
+              idSubgrupoSP: createSubgroup.dataValues.idSubgrupo,
+            },
+            { fields: ["idProductoC2SP", "idSubgrupoSP"] }
+          );
+        }
+      }
+    }
+
+    res.json("Practica creada satisfactoriamente");
+  } catch (error) {
     console.log(error);
   }
 }

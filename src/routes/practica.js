@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
-  createPractice,
+  createPractice1,
+  createPractice2,
   getAllPractica,
   getPracticeStudentsPerGroup,
   getStudentsPerGroup,
@@ -14,7 +15,8 @@ import {
 const router = Router();
 
 // Inserciones
-router.post("/", createPractice);
+router.post("/corte1", createPractice1);
+router.post("/corte2", createPractice2);
 
 // Consultas
 // api/practica

@@ -71,8 +71,10 @@ router.get(
 // Corte 2
 
 // Inserciones
-router.post("/corte2/referencia", createReferenceProductC2);
-router.post("/corte2/inspeccion", createInspectionProductC2);
+router.get(
+  "/corte2/inspeccion/:idPractica/estudiante/:idEstudiante",
+  createInspectionProductC2
+);
 
 // Consultas
 router.get("/corte2", getAllProductsC2);

@@ -1,6 +1,6 @@
 export const REFRESCOS = "Refrescos";
 export const BOLSA_ARROZ = "Bolsa de arroz";
-export const BOLSA_CHOCOLATE = "Barra de chocolate";
+export const BARRA_CHOCOLATE = "Barra de chocolate";
 export const BARRA_JABON = "Barra de jabon";
 export const PITILLOS = "Pitillos";
 
@@ -9,6 +9,7 @@ export const attRefrescos = {
   EtiquetaSuelta: "Etiqueta suelta",
   EnvaseSucio: "Envase sucio",
   TapaFloja: "Tapa floja",
+  Ninguno: "Ninguno",
 };
 
 export const attBolsaArroz = {
@@ -16,12 +17,14 @@ export const attBolsaArroz = {
   BolsaRota: "Bolsa rota",
   TextoIncompleto: "Texto incompleto",
   Suciedades: "Suciedades",
+  Ninguno: "Ninguno",
 };
 
 export const attPitillos = {
   Doblados: "Doblados",
   Suciedades: "Suciedades",
   VariacionColor: "Variación de color",
+  Ninguno: "Ninguno",
 };
 
 export const attBarraChocolate = {
@@ -29,6 +32,7 @@ export const attBarraChocolate = {
   VariacionColor: "Variación de color",
   TextoIncompleto: "Texto incompleto",
   SellosIrregulares: "Sellos irregulares",
+  Ninguno: "Ninguno",
 };
 
 export const attBarraJabon = {
@@ -38,6 +42,7 @@ export const attBarraJabon = {
   TextosIlegibles: "Textos ilegibles",
   Deforme: "Deforme",
   VariacionColorEmpaque: "Variación de color empaque",
+  Ninguno: "Ninguno",
 };
 
 const urlsrcModelJabon = process.env.URL_BARRA_JABON;
@@ -136,7 +141,7 @@ export const pitillosModelsSrc = {
 
 export const refrescosModelsSrc = {
   poster_refresco: `${urlsrcModelRefresco}/poster.png`,
-  Refresco: `${urlsrcModelRefresco}/Refresco.glb.png`,
+  Refresco: `${urlsrcModelRefresco}/Refresco.glb`,
   Refresco_defectuoso: `${urlsrcModelRefresco}/Refresco_defectuoso.glb`,
   Refresco_envase_sucio: `${urlsrcModelRefresco}/Refresco_envase_sucio.glb`,
   Refresco_envase_sucio_texto_ilegible: `${urlsrcModelRefresco}/Refresco_envase_sucio_texto_ilegible.glb`,
@@ -152,4 +157,33 @@ export const refrescosModelsSrc = {
   Refresco_tapa_floja_envase_sucio_texto_ilegible: `${urlsrcModelRefresco}/Refresco_tapa_floja_envase_sucio_texto_ilegible.glb`,
   Refresco_tapa_floja_texto_ilegible: `${urlsrcModelRefresco}/Refresco_tapa_floja_texto_ilegible.glb`,
   Refresco_texto_ilegible: `${urlsrcModelRefresco}/Refresco_texto_ilegible.glb`,
+};
+
+export const ATRIBUTOS_CODE = {
+  "Variacion de color": 1,
+  "Empaque roto": 2,
+  "Textos ilegibles": 3,
+  Deforme: 4,
+  "Bolsa rota": 5,
+  "Textos incompletos": 6,
+  Suciedades: 7,
+  "Barra partida": 8,
+  "Sellos irregulares": 9,
+  Doblado: 10,
+  "Etiqueta suelta": 11,
+  "Envase sucio": 12,
+  "Tapa floja": 13,
+  Ninguno: 14,
+};
+
+export const GRAFICOS_CODE = {
+  Media: 1,
+  Rango: 2,
+  "Desviación estandar": 3,
+  "P con n constante": 4,
+  "P con n variable": 5,
+  NP: 6,
+  C: 7,
+  "U con n constante": 8,
+  "U con n variable": 9,
 };

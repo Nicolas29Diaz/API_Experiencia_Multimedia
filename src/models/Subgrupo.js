@@ -13,6 +13,7 @@ const Subgrupo = sequelize.define(
     },
     nombreSubgrupo: { type: DataTypes.STRING(25), allowNull: false },
     cantidadSubgrupo: { type: DataTypes.INTEGER, allowNull: false },
+    tipoSubgrupo: { type: DataTypes.STRING(20), allowNull: false },
   },
   { tableName: "subgrupo", timestamps: false }
 );

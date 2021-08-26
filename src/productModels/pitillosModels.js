@@ -9,7 +9,7 @@ export const pitillosModels = (atributos) => {
   let isNothing = ishasAttribute(attPitillos.Ninguno);
 
   if (isNothing) {
-    return attPitillos.Pitillo;
+    return pitillosModelsSrc.Pitillo;
   }
 
   if (lengthAttributes === 1) {

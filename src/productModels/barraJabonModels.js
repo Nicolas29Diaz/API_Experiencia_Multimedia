@@ -7,7 +7,6 @@ export const barraJabonModels = (atributos) => {
 
   let isBarVariationColor = ishasAttribute(attBarraJabon.VariacionColorBarra);
   let isBoxVariationColor = ishasAttribute(attBarraJabon.VariacionColorEmpaque);
-  let isBothVariationColor = ishasAttribute(attBarraJabon.VariacionColor);
   let isRippedBox = ishasAttribute(attBarraJabon.EmpaqueRoto);
   let isIllegibleTexts = ishasAttribute(attBarraJabon.TextosIlegibles);
   let isDeformed = ishasAttribute(attBarraJabon.Deforme);
@@ -33,10 +32,6 @@ export const barraJabonModels = (atributos) => {
     if (isBoxVariationColor) {
       console.log("tiene variacion de color en el empaque");
       return barraJabonModelsSrc.Barra_jabon_empaque_variacion_color;
-    }
-    if (isBothVariationColor) {
-      console.log("tiene variacion de color en la barra y el empaque");
-      return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_variacion_color;
     }
     if (isDeformed) {
       console.log("esta deforme");
@@ -73,25 +68,17 @@ export const barraJabonModels = (atributos) => {
       console.log("esta deforme y tiene variacion de color en la barra");
       return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme;
     }
-    if (isDeformed && isBothVariationColor) {
-      console.log("esta deforme y tiene variacion de color");
-      return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_variacion_color;
-    }
     if (isRippedBox && isBarVariationColor) {
       console.log("tiene empaque roto y variacion de color en la barra");
       return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_roto;
     }
-    if (isRippedBox && isBothVariationColor) {
-      console.log("tiene empaque roto y variacion de color");
-      return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_variacion_color_empaque_roto;
-    }
-    if (isIllegibleTexts && isBothVariationColor) {
-      console.log("tiene textos ilegibles y variacion de color");
-      return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_variacion_color_texto_ilegible;
-    }
     if (isIllegibleTexts && isBarVariationColor) {
       console.log("tiene textos ilegibles y variacion de color en la barra");
       return barraJabonModelsSrc.Barra_jabon_variacion_color_texto_ilegible;
+    }
+    if (isBarVariationColor && isBoxVariationColor) {
+      console.log("tiene variacion de color en la barra y en el empaque");
+      return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_variacion_color;
     }
   }
 
@@ -124,13 +111,17 @@ export const barraJabonModels = (atributos) => {
       );
       return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_roto;
     }
-    if (isDeformed && isBothVariationColor && isRippedBox) {
-      console.log("esta deforme, tiene variacion de color y empaque roto");
-      return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_variacion_color_empaque_roto;
+    if (isBarVariationColor && isBoxVariationColor && isDeformed) {
+      console.log("tiene variacion de color en ambos y es deforme");
+      return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_variacion_color;
     }
-    if (isDeformed && isBothVariationColor && isIllegibleTexts) {
-      console.log("esta deforme, tiene variacion de color y textos ilegibles");
-      return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_variacion_color_texto_ilegible;
+    if (isBarVariationColor && isBoxVariationColor && isIllegibleTexts) {
+      console.log("tiene variacion de color en ambos y es deforme");
+      return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_variacion_color_texto_ilegible;
+    }
+    if (isBarVariationColor && isBoxVariationColor && isRippedBox) {
+      console.log("tiene variacion de color en ambos y el empaque roto");
+      return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_variacion_color_empaque_roto;
     }
     if (isIllegibleTexts && isBarVariationColor && isDeformed) {
       console.log(
@@ -159,11 +150,38 @@ export const barraJabonModels = (atributos) => {
       );
       return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_roto_texto_ilegible;
     }
-    if (isDeformed && isRippedBox && isIllegibleTexts && isBothVariationColor) {
+    if (
+      isDeformed &&
+      isRippedBox &&
+      isBoxVariationColor &&
+      isBarVariationColor
+    ) {
       console.log(
-        "esta deforme, tiene empaque roto, textos ilegibles y variacion de color"
+        "esta deforme, tiene empaque roto, variacion de color en el empaque y variacion de color en la barra"
       );
-      return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_variacion_color_empaque_roto_texto_ilegible;
+      return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_variacion_color_empaque_roto;
+    }
+    if (
+      isDeformed &&
+      isBoxVariationColor &&
+      isIllegibleTexts &&
+      isBarVariationColor
+    ) {
+      console.log(
+        "esta deforme, tiene variacion de color en el empaque, textos ilegibles y variacion de color en la barra"
+      );
+      return barraJabonModelsSrc.Barra_jabon_variacion_color_deforme_empaque_variacion_color_texto_ilegible;
+    }
+    if (
+      isBoxVariationColor &&
+      isRippedBox &&
+      isIllegibleTexts &&
+      isBarVariationColor
+    ) {
+      console.log(
+        "tiene variacion de color en el empaque, empaque roto, textos ilegibles y variacion de color en la barra"
+      );
+      return barraJabonModelsSrc.Barra_jabon_variacion_color_empaque_variacion_color_empaque_roto_texto_ilegible;
     }
   }
 };

@@ -3,6 +3,10 @@ export const BOLSA_ARROZ = "Bolsa de arroz";
 export const BARRA_CHOCOLATE = "Barra de chocolate";
 export const BARRA_JABON = "Barra de jabon";
 export const PITILLOS = "Pitillos";
+export const CONSTANTE = "constante";
+export const ALEATORIO = "aleatorio";
+export const VARIABLE = "variable";
+export const ATRIBUTO = "atributo";
 
 export const attRefrescos = {
   TextosIlegibles: "Textos ilegibles",
@@ -13,35 +17,35 @@ export const attRefrescos = {
 };
 
 export const attBolsaArroz = {
-  VariacionColor: "Variación de color",
+  VariacionColor: "Variacion de color",
   BolsaRota: "Bolsa rota",
-  TextoIncompleto: "Texto incompleto",
+  TextoIncompleto: "Textos incompletos",
   Suciedades: "Suciedades",
   Ninguno: "Ninguno",
 };
 
 export const attPitillos = {
-  Doblados: "Doblados",
+  Doblados: "Doblado",
   Suciedades: "Suciedades",
-  VariacionColor: "Variación de color",
+  VariacionColor: "Variacion de color",
   Ninguno: "Ninguno",
 };
 
 export const attBarraChocolate = {
   BarraPartida: "Barra partida",
-  VariacionColor: "Variación de color",
-  TextoIncompleto: "Texto incompleto",
+  VariacionColor: "Variacion de color",
+  TextoIncompleto: "Textos incompletos",
   SellosIrregulares: "Sellos irregulares",
   Ninguno: "Ninguno",
 };
 
 export const attBarraJabon = {
-  VariacionColor: "Variación de color",
-  VariacionColorBarra: "Variación de color barra",
+  VariacionColor: "Variacion de color",
+  VariacionColorBarra: "Variacion de color barra",
+  VariacionColorEmpaque: "Variacion de color empaque",
   EmpaqueRoto: "Empaque roto",
   TextosIlegibles: "Textos ilegibles",
   Deforme: "Deforme",
-  VariacionColorEmpaque: "Variación de color empaque",
   Ninguno: "Ninguno",
 };
 
@@ -82,7 +86,7 @@ export const barraJabonModelsSrc = {
   Barra_jabon_variacion_color_empaque_roto_texto_ilegible: `${urlsrcModelJabon}/Barra_jabon_variacion_color_empaque_roto_texto_ilegible.glb`,
   Barra_jabon_variacion_color_empaque_variacion_color: `${urlsrcModelJabon}/Barra_jabon_variacion_color_empaque_variacion_color.glb`,
   Barra_jabon_variacion_color_empaque_variacion_color_empaque_roto: `${urlsrcModelJabon}/Barra_jabon_variacion_color_empaque_variacion_color_empaque_roto.glb`,
-  Barra_jabon_variacion_color_empaque_variacion_color_roto: `${urlsrcModelJabon}/Barra_jabon_variacion_color_empaque_variacion_color_roto.glb`,
+  Barra_jabon_variacion_color_empaque_variacion_color_empaque_roto_texto_ilegible: `${urlsrcModelJabon}/Barra_jabon_variacion_color_empaque_variacion_color_empaque_roto_texto_ilegible.glb`,
   Barra_jabon_variacion_color_empaque_variacion_color_texto_ilegible: `${urlsrcModelJabon}/Barra_jabon_variacion_color_empaque_variacion_color_texto_ilegible.glb`,
   Barra_jabon_variacion_color_texto_ilegible: `${urlsrcModelJabon}/Barra_jabon_variacion_color_texto_ilegible.glb`,
 };
@@ -174,6 +178,8 @@ export const ATRIBUTOS_CODE = {
   "Envase sucio": 12,
   "Tapa floja": 13,
   Ninguno: 14,
+  "Variacion de color barra": 15,
+  "Variacion de color empaque": 16,
 };
 
 export const GRAFICOS_CODE = {
@@ -186,4 +192,22 @@ export const GRAFICOS_CODE = {
   C: 7,
   "U con n constante": 8,
   "U con n variable": 9,
+};
+
+export const METHODS_CODE = {
+  1: "K",
+  2: "M",
+  3: "Rango",
+};
+
+export const selectedGraphic = {
+  1: "variable",
+  2: "variable",
+  3: "variable",
+  4: "constante",
+  5: "aleatorio",
+  6: "constante",
+  7: "constante",
+  8: "constante",
+  9: "aleatorio",
 };

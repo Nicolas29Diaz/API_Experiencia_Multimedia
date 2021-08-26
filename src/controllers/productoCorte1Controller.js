@@ -8,12 +8,9 @@ import { getModels } from "../productModels";
 export async function createInspectionProductC1(req, res) {
   try {
     const { idPractica, idEstudiante } = req.params;
+
     const getStudentProduct = await sequelize.query(
-      `select p.nombrePC1,p.variablePrincipalC1,p.toleranciaPC1,p.unidadesPC1, p.idGrupoEstudiantePC1 from producto_corte_1 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and e.idEstudiante='${idEstudiante}';`,
-      { type: sequelize.QueryTypes.SELECT }
-    );
-    const getProductAttributes = await sequelize.query(
-      `select a.nombreAtributo as atributo from atributo a, producto_atributo_1 pra, producto_corte_1 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pra.idAtributoPA1 and pra.idProductoC1A=p.idProductoC1 and p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante='${idEstudiante}' and pa.idPractica=${idPractica};`,
+      `select p.nombrePC1, p.variablePrincipalC1, p.toleranciaPC1, p.unidadesPC1, p.idGrupoEstudiantePC1, group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC1 limit 1;`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
@@ -23,6 +20,7 @@ export async function createInspectionProductC1(req, res) {
       toleranciaPC1,
       unidadesPC1,
       idGrupoEstudiantePC1,
+      atributos,
     } = getStudentProduct[0];
 
     let getRandomTolerancePrincipal = 0;
@@ -30,10 +28,9 @@ export async function createInspectionProductC1(req, res) {
     let resultRandomAttributesList = 0;
 
     let inspectionProduct = "";
-    let newProduct = {};
 
-    let atributos = getProductAttributes.map((product) => product.atributo);
-    let randomItem = getRandomMinMax(1, atributos.length);
+    let atributosProduct = atributos.split(",");
+    let randomItem = 0;
 
     // Número de productos en buen estado
     let normalProductAmount = Math.round(unidadesPC1 * 0.6);
@@ -49,24 +46,26 @@ export async function createInspectionProductC1(req, res) {
         toleranciaPC1
       );
 
-      getRandomToleranceSecondary = isHasProductName && getRandomMinMax(-2, 2);
-      resultRandomAttributesList = getRandomAttributes(randomItem, atributos);
+      randomItem = getRandomMinMax(1, atributosProduct.length);
 
-      newProduct = {
-        nombrePC1,
-        variablePrincipalC1: variablePrincipalC1 + getRandomTolerancePrincipal,
-        ...(isHasProductName === BARRA_JABON && {
-          variableSecundariaC1: 39 + getRandomToleranceSecondary,
-        }),
-        ...(isHasProductName && {
-          variableSecundariaC1: 15 + getRandomToleranceSecondary,
-        }),
-        idGrupoEstudiantePC1,
-      };
+      getRandomToleranceSecondary = isHasProductName && getRandomMinMax(-2, 2);
+      resultRandomAttributesList = getRandomAttributes(
+        randomItem,
+        atributosProduct
+      );
 
       inspectionProduct = await ProductoCorte1.create(
         {
-          ...newProduct,
+          nombrePC1,
+          variablePrincipalC1:
+            variablePrincipalC1 + getRandomTolerancePrincipal,
+          ...(isHasProductName === BARRA_JABON && {
+            variableSecundariaC1: 39 + getRandomToleranceSecondary,
+          }),
+          ...(isHasProductName && {
+            variableSecundariaC1: 15 + getRandomToleranceSecondary,
+          }),
+          idGrupoEstudiantePC1,
         },
         {
           fields: [
@@ -90,24 +89,26 @@ export async function createInspectionProductC1(req, res) {
         toleranciaPC1 + 5
       );
 
-      getRandomToleranceSecondary = isHasProductName && getRandomMinMax(-5, 5);
-      resultRandomAttributesList = getRandomAttributes(randomItem, atributos);
+      randomItem = getRandomMinMax(1, atributosProduct.length);
 
-      newProduct = {
-        nombrePC1,
-        variablePrincipalC1: variablePrincipalC1 + getRandomTolerancePrincipal,
-        ...(isHasProductName === BARRA_JABON && {
-          variableSecundariaC1: 39 + getRandomToleranceSecondary,
-        }),
-        ...(isHasProductName && {
-          variableSecundariaC1: 15 + getRandomToleranceSecondary,
-        }),
-        idGrupoEstudiantePC1,
-      };
+      getRandomToleranceSecondary = isHasProductName && getRandomMinMax(-5, 5);
+      resultRandomAttributesList = getRandomAttributes(
+        randomItem,
+        atributosProduct
+      );
 
       inspectionProduct = await ProductoCorte1.create(
         {
-          ...newProduct,
+          nombrePC1,
+          variablePrincipalC1:
+            variablePrincipalC1 + getRandomTolerancePrincipal,
+          ...(isHasProductName === BARRA_JABON && {
+            variableSecundariaC1: 39 + getRandomToleranceSecondary,
+          }),
+          ...(isHasProductName && {
+            variableSecundariaC1: 15 + getRandomToleranceSecondary,
+          }),
+          idGrupoEstudiantePC1,
         },
         {
           fields: [
@@ -212,30 +213,49 @@ export async function getPracticeOneProductInfoPerStudent(req, res) {
       { type: sequelize.QueryTypes.SELECT }
     );
 
-    let productAtributes = [];
+    // const productsStudent = await sequelize.query(
+    //   `select p.idProductoC1, p.nombrePC1, p.variablePrincipalC1, p.variableSecundariaC1, group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC1;`,
+    //   { type: sequelize.QueryTypes.SELECT }
+    // );
 
-    let newProduct = {};
+    const mapProduct = productsStudent.map(
+      ({ nombrePC1, variablePrincipalC1, variableSecundariaC1, atributos }) => {
+        let separateAttributes = atributos.split(",");
 
-    const productMap = await Promise.all(
-      productsStudent.map(async (p) => {
-        productAtributes = await sequelize.query(
-          `select a.nombreAtributo as atributo from atributo a, producto_atributo_1 pa, producto_corte_1 p where a.idAtributo=pa.idAtributoPA1 and pa.idProductoC1A=p.idProductoC1 and p.idProductoC1=${p.idProductoC1};`,
-          { type: sequelize.QueryTypes.SELECT }
-        );
-
-        let mapAttributes = productAtributes.map(({ atributo }) => atributo);
-
-        newProduct = {
-          idProductoC1: p.idProductoC1,
-          nombrePC1: p.nombrePC1,
-          variablePrincipalC1: p.variablePrincipalC1,
-          variableSecundariaC1: p.variableSecundariaC1,
-          src: getModels(p.nombrePC1, mapAttributes),
+        return {
+          nombre: nombrePC1,
+          variablePrincipal: variablePrincipalC1,
+          variableSecundaria: variableSecundariaC1,
+          src: getModels(nombrePC1, separateAttributes),
+          atributos,
         };
-
-        return newProduct;
-      })
+      }
     );
+
+    // let productAtributes = [];
+
+    // let newProduct = {};
+
+    // const productMap = await Promise.all(
+    //   productsStudent.map(async (p) => {
+    //     productAtributes = await sequelize.query(
+    //       `select a.nombreAtributo as atributo from atributo a, producto_atributo_1 pa, producto_corte_1 p where a.idAtributo=pa.idAtributoPA1 and pa.idProductoC1A=p.idProductoC1 and p.idProductoC1=${p.idProductoC1};`,
+    //       { type: sequelize.QueryTypes.SELECT }
+    //     );
+
+    //     let mapAttributes = productAtributes.map(({ atributo }) => atributo);
+
+    //     newProduct = {
+    //       idProductoC1: p.idProductoC1,
+    //       nombrePC1: p.nombrePC1,
+    //       variablePrincipalC1: p.variablePrincipalC1,
+    //       variableSecundariaC1: p.variableSecundariaC1,
+    //       src: getModels(p.nombrePC1, mapAttributes),
+    //     };
+
+    //     return newProduct;
+    //   })
+    // );
 
     res.json(productMap);
   } catch (error) {

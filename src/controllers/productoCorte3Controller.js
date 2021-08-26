@@ -1,90 +1,9 @@
 import { sequelize } from "../database/database";
+import ProductoAtributo3 from "../models/ProductoAtributo3";
 import ProductoCorte3 from "../models/ProductoCorte3";
-
-// Crear productos cuando el tipo de muestreo es por atributos
-export async function createReferenceProductC3TypeA(req, res){
-  const {nombrePC3, tamanioLote, aql, severidad, nivelInspeccion,idGrupoEstudiantePC3} = req.body;
-  try {
-    const referenceProduct = await ProductoCorte3.create({
-      nombrePC3,
-      tamanioLote,
-      aql,
-      severidad,
-      nivelInspeccion,
-      idGrupoEstudiantePC3
-    },{fields:['nombrePC3','tamanioLote','aql','severidad','nivelInspeccion','idGrupoEstudiantePC3']});
-    console.log(referenceProduct);
-    res.json(referenceProduct);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-export async function createInspectionProductC3TypeA(req, res){
-  const {nombrePC3,idGrupoEstudiantePC3} = req.body;
-  try {
-    const inspectionProduct = await ProductoCorte3.create({
-      nombrePC3,
-      idGrupoEstudiantePC3
-    },{fields:['nombrePC3','idGrupoEstudiantePC3']});
-    console.log(inspectionProduct);
-    res.json(inspectionProduct);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// Crear productos cuando el tipo de muestreo es por variables
-export async function createReferenceProductC3TypeV(req, res){
-  const {nombrePC3, variablePrincipalC3, toleranciaPC3, tamanioLote, aql, severidad, nivelInspeccion,idGrupoEstudiantePC3} = req.body;
-  try {
-    const referenceProduct = await ProductoCorte3.create({
-      nombrePC3,
-      variablePrincipalC3,
-      toleranciaPC3,
-      tamanioLote,
-      aql,
-      severidad,
-      nivelInspeccion,
-      idGrupoEstudiantePC3
-    },{fields:['nombrePC3','variablePrincipalC3','toleranciaPC3','tamanioLote','aql','severidad','nivelInspeccion','idGrupoEstudiantePC3']});
-    console.log(referenceProduct);
-    res.json(referenceProduct);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-export async function createInspectionProductC3TypeV(req, res){
-  const {nombrePC3, variablePrincipalC3, variableSecundariaC3,idGrupoEstudiantePC3} = req.body;
-  try {
-    const inspectionProduct = await ProductoCorte3.create({
-      nombrePC3,
-      variablePrincipalC3,
-      variableSecundariaC3,
-      idGrupoEstudiantePC3
-    },{fields:['nombrePC3','variablePrincipalC3','variableSecundariaC3','idGrupoEstudiantePC3']});
-    console.log(inspectionProduct);
-    res.json(inspectionProduct);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// export async function createInspectionProductC3TypeV2(req, res){
-//   const {nombrePC3, variablePrincipalC3, idGrupoEstudiantePC3} = req.body;
-//   try {
-//     const inspectionProduct = await ProductoCorte3.create({
-//       nombrePC3,
-//       variablePrincipalC3,
-//       idGrupoEstudiantePC3
-//     },{fields:['nombrePC3','variablePrincipalC3','idGrupoEstudiantePC3']});
-//     console.log(inspectionProduct);
-//     res.json(inspectionProduct);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
+import { getRandomAttributes, getRandomMinMax } from "../helpers";
+import { ATRIBUTOS_CODE, BARRA_JABON, REFRESCOS } from "../constants";
+import { getModels } from "../productModels";
 
 export async function getAllProductsC3(req, res) {
   try {
@@ -95,58 +14,155 @@ export async function getAllProductsC3(req, res) {
   }
 }
 
-export async function getPracticeThreeProductInfoPerGroup(req, res){
-  const {nombreGrupo, idPractica} = req.params
+// Conseguir datos de la practica
+export async function getPracticeThreeProductPerStudent(req, res) {
+  const { idEstudiante, idPractica } = req.params;
   try {
-    const practiceProductsInfo = await sequelize.query(`select p.nombrePC3,p.tamanioLote,p.aql,p.severidad,p.nivelInspeccion from producto_corte_3 p, grupo_estudiante ge, grupo g, practica pa where p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and g.nombreGrupo='${nombreGrupo}' and pa.idPractica=${idPractica} group by p.nombrePC3;`,{ type: sequelize.QueryTypes.SELECT })
-    console.log(practiceProductsInfo);
-    res.json(practiceProductsInfo);
-  } catch (error) {
-    console.log(error)
-  }
-}
+    const samplingType = await sequelize.query(
+      ` select p.* from producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and p.variablePrincipalC3 is not null and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} limit 1;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
 
-export async function getPracticeThreeProductAtributesPerGroup(req, res){
-  const {nombreGrupo, idPractica} = req.params
-  try {
-    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_3 pra, producto_corte_3 p, grupo_estudiante ge, grupo g, practica pa where a.idAtributo=pra.idAtributoPA3 and pra.idProductoC3A=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and g.nombreGrupo='${nombreGrupo}' and pa.idPractica=${idPractica} group by a.nombreAtributo;`,{ type: sequelize.QueryTypes.SELECT })
-    console.log(productAtributes);
-    res.json(productAtributes);
-  } catch (error) {
-    console.log(error)
-  }
-}
+    let productsStudent = "";
 
-export async function getPracticeThreeProductPerStudent(req, res){
-  const {idEstudiante} = req.params
-  try {
-    const productsStudent = await sequelize.query(`select p.nombrePC3,p.variablePrincipalC3,p.variableSecundariaC3 from producto_corte_3 p, grupo_estudiante ge, estudiante e where p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and e.idEstudiante=${idEstudiante};`,{ type: sequelize.QueryTypes.SELECT })
-    console.log(productsStudent);
+    if (samplingType.length > 0) {
+      productsStudent = await sequelize.query(
+        `select p.idGrupoEstudiantePC3, p.nombrePC3, p.variablePrincipalC3,p.toleranciaPC3,p.tamanioLote,p.aql,p.severidad,p.nivelInspeccion,group_concat(m.nombreMetodo separator ',') as metodos from metodo m, metodo_producto mp, producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where m.idMetodo=mp.idMetodoMP and mp.idProductoMP=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.nombrePC3 limit 1;`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+    } else {
+      productsStudent = await sequelize.query(
+        `select p.idGrupoEstudiantePC3, p.nombrePC3,p.tamanioLote,p.aql,p.severidad,p.nivelInspeccion,group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_3 pa3, producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.nombrePC3 limit 1;`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+    }
+
     res.json(productsStudent);
   } catch (error) {
-    console.log(error)
+    console.log(error);
+    res.status(500).json("Hubo un error");
   }
 }
 
-// Parecida a la anterior, pero agrega la informacion de los atributos
-export async function getPracticeThreeProductInfoPerStudent(req, res){
-  const {idEstudiante} = req.params
+export async function createInspectionProductC3(req, res) {
   try {
-    const productsStudent = await sequelize.query(`select p.idProductoC3, p.nombrePC3, p.variablePrincipalC3, p.variableSecundariaC3, a.nombreAtributo from atributo a, producto_atributo_3 pa, producto_corte_3 p, grupo_estudiante ge, estudiante e where a.idAtributo=pa.idAtributoPA3 and pa.idProductoC3A=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and e.idEstudiante=${idEstudiante} order by p.idProductoC3;`,{ type: sequelize.QueryTypes.SELECT })
-    console.log(productsStudent);
-    res.json(productsStudent);
+    const {
+      tamanioMuestra,
+      idGrupoEstudiantePC3,
+      nombrePC3,
+      variablePrincipalC3,
+      toleranciaPC3,
+      atributos,
+    } = req.body;
+
+    let getRandomTolerancePrincipal = 0;
+    let getRandomToleranceSecondary = 0;
+    let resultRandomAttributesList = 0;
+    let randomItem = 0;
+
+    let inspectionProduct = "";
+
+    let atributosProduct = atributos?.split(",");
+
+    let isHasProductName = nombrePC3 === REFRESCOS || nombrePC3 === BARRA_JABON;
+
+    if (variablePrincipalC3) {
+      for (let i = 0; i < tamanioMuestra; i++) {
+        getRandomTolerancePrincipal = getRandomMinMax(
+          -toleranciaPC3,
+          toleranciaPC3
+        );
+
+        inspectionProduct = await ProductoCorte3.create(
+          {
+            nombrePC3,
+            variablePrincipalC3:
+              variablePrincipalC3 + getRandomTolerancePrincipal,
+            ...(isHasProductName === BARRA_JABON && {
+              variableSecundariaC3: 39 + getRandomToleranceSecondary,
+            }),
+            ...(isHasProductName && {
+              variableSecundariaC3: 15 + getRandomToleranceSecondary,
+            }),
+            idGrupoEstudiantePC3,
+          },
+          {
+            fields: [
+              "nombrePC3",
+              "variablePrincipalC3",
+              "variableSecundariaC3",
+              "idGrupoEstudiantePC3",
+            ],
+          }
+        );
+        await ProductoAtributo3.create({
+          idAtributoPA3: ATRIBUTOS_CODE["Ninguno"],
+          idProductoC3A: inspectionProduct.dataValues.idProductoC3,
+        });
+      }
+    } else {
+      for (let i = 0; i < tamanioMuestra; i++) {
+        getRandomTolerancePrincipal = getRandomMinMax(
+          -toleranciaPC3,
+          toleranciaPC3
+        );
+
+        randomItem = getRandomMinMax(1, atributosProduct.length);
+
+        resultRandomAttributesList = getRandomAttributes(
+          randomItem,
+          atributosProduct
+        );
+
+        inspectionProduct = await ProductoCorte3.create(
+          {
+            nombrePC3,
+            idGrupoEstudiantePC3,
+          },
+          {
+            fields: ["nombrePC3", "idGrupoEstudiantePC3"],
+          }
+        );
+        for (let j = 0; j < resultRandomAttributesList.length; j++) {
+          await ProductoAtributo3.create({
+            idAtributoPA3: ATRIBUTOS_CODE[resultRandomAttributesList[j]],
+            idProductoC3A: inspectionProduct.dataValues.idProductoC3,
+          });
+        }
+      }
+    }
   } catch (error) {
-    console.log(error)
+    res.status(500).json("Hubo un error");
+    console.log(error);
   }
 }
 
-export async function getPracticeThreeProductAtributes(req, res){
-  const {idProductoC3} = req.params
+// Se obtienen los productos para la inspección
+export async function getPracticeThreeProductInfoPerStudent(req, res) {
+  const { idEstudiante, idPractica } = req.params;
   try {
-    const productAtributes = await sequelize.query(`select a.nombreAtributo from atributo a, producto_atributo_3 pa, producto_corte_3 p where a.idAtributo=pa.idAtributoPA3 and pa.idProductoC3A=p.idProductoC3 and p.idProductoC3=${idProductoC3};`,{ type: sequelize.QueryTypes.SELECT })
-    console.log(productAtributes);
-    res.json(productAtributes);
+    // si es muestreo por atributos
+    const productsStudent = await sequelize.query(
+      `select p.idProductoC3, p.nombrePC3, p.variablePrincipalC3, p.variableSecundariaC3, group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_3 pa3, producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC3;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const mapProduct = productsStudent.map(
+      ({ nombrePC3, variablePrincipalC3, variableSecundariaC3, atributos }) => {
+        let separateAttributes = atributos.split(",");
+
+        return {
+          nombre: nombrePC3,
+          variablePrincipal: variablePrincipalC3,
+          variableSecundaria: variableSecundariaC3,
+          src: getModels(nombrePC3, separateAttributes),
+          atributos,
+        };
+      }
+    );
+
+    res.json(mapProduct);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }

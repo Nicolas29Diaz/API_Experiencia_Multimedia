@@ -9,6 +9,8 @@ import grupoRoutes from "./routes/grupo";
 import estudianteRoutes from "./routes/estudiante";
 import productoRoutes from "./routes/Producto/producto";
 import atributoRoutes from "./routes/Atributo/Atributo";
+import usuarioRoutes from "./routes/usuario";
+import authRoutes from "./routes/auth";
 
 // Initializations
 const app = express();
@@ -19,6 +21,8 @@ app.use(json());
 app.use(cors());
 
 // routes
+app.use("/api/usuario", usuarioRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/profesor", profesorRoutes);
 app.use("/api/cursos", cursoRoutes);
 app.use("/api/practica", practicaRoutes);

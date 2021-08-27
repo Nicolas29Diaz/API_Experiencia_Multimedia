@@ -12,6 +12,8 @@ const Estudiante = sequelize.define(
     },
     nombreEstudiante: { type: DataTypes.STRING(50), allowNull: false },
     apellidoEstudiante: { type: DataTypes.STRING(50), allowNull: false },
+    emailEstudiante: { type: DataTypes.STRING(100), allowNull: false },
+    contrasenaEstudiante: { type: DataTypes.STRING(100), allowNull: false },
   },
   { tableName: "estudiante", timestamps: false }
 );

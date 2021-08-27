@@ -13,6 +13,8 @@ const Profesor = sequelize.define(
     },
     nombreProfesor: { type: DataTypes.STRING(50), allowNull: false },
     apellidoProfesor: { type: DataTypes.STRING(50), allowNull: false },
+    emailProfesor: { type: DataTypes.STRING(100), allowNull: false },
+    contrasenaProfesor: { type: DataTypes.STRING(100), allowNull: false },
   },
   { tableName: "profesor", timestamps: false }
 );

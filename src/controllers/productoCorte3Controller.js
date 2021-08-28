@@ -1,4 +1,4 @@
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 import ProductoAtributo3 from "../models/ProductoAtributo3";
 import ProductoCorte3 from "../models/ProductoCorte3";
 import { getRandomAttributes, getRandomMinMax } from "../helpers";

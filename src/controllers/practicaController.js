@@ -1,4 +1,3 @@
-import { sequelize } from "../database/database";
 import Grupo from "../models/Grupo";
 import Practica from "../models/Practica";
 import { getRandomMinMax } from "../helpers";

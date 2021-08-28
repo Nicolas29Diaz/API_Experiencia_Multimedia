@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 import GrupoEstudiante from "./GrupoEstudiante";
 
 const Grupo = sequelize.define(

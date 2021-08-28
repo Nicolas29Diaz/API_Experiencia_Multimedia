@@ -1,4 +1,4 @@
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 import Curso from "../Models/Curso";
 
 export async function insertCourse(req, res) {
@@ -12,7 +12,6 @@ export async function insertCourse(req, res) {
       },
       { fields: ["nombreCurso", "periodoAcademico", "idProfesorC"] }
     );
-    console.log(curso);
     res.json(curso);
   } catch (error) {
     console.log(error);

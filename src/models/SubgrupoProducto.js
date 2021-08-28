@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 
 const SubgrupoProducto = sequelize.define(
   "subgrupo_producto",

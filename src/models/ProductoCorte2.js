@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 import ProductoAtributo2 from "./ProductoAtributo2";
 import SubgrupoProducto from "./SubgrupoProducto";
 

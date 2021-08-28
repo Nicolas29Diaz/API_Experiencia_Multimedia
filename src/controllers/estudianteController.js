@@ -1,16 +1,32 @@
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 import Estudiante from "../models/Estudiante";
 
 export async function insertStudent(req, res) {
-  const { idEstudiante, nombreEstudiante, apellidoEstudiante } = req.body;
+  const {
+    idEstudiante,
+    nombreEstudiante,
+    apellidoEstudiante,
+    emailEstudiante,
+    contrasenaEstudiante,
+  } = req.body;
   try {
     const estudiante = await Estudiante.create(
       {
         idEstudiante,
         nombreEstudiante,
         apellidoEstudiante,
+        emailEstudiante,
+        contrasenaEstudiante,
       },
-      { fields: ["idEstudiante", "nombreEstudiante", "apellidoEstudiante"] }
+      {
+        fields: [
+          "idEstudiante",
+          "nombreEstudiante",
+          "apellidoEstudiante",
+          "emailEstudiante",
+          "contrasenaEstudiante",
+        ],
+      }
     );
     res.json(estudiante);
   } catch (error) {

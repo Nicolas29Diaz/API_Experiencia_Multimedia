@@ -1,4 +1,4 @@
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 import ProductoCorte1 from "../Models/ProductoCorte1";
 import { getRandomMinMax, getRandomAttributes } from "../helpers";
 import { REFRESCOS, BARRA_JABON, ATRIBUTOS_CODE } from "../constants/index";

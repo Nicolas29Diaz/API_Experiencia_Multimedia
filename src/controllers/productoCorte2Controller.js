@@ -1,4 +1,4 @@
-import { sequelize } from "../database/database";
+import { sequelize } from "../config/database";
 import ProductoAtributo2 from "../Models/ProductoAtributo2";
 import ProductoCorte2 from "../Models/ProductoCorte2";
 import SubgrupoProducto from "../Models/SubgrupoProducto";

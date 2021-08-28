@@ -9,7 +9,7 @@ export async function registerUser(req, res) {
 
     let findUser = "";
 
-    if (role === "estudiante") {
+    if (role.value === "estudiante") {
       findUser = await Estudiante.findOne({
         where: { emailEstudiante: email },
       });
@@ -65,10 +65,10 @@ export async function registerUser(req, res) {
       );
     }
 
-    if (role === "profesor") {
+    if (role.value === "profesor") {
       findUser = await Profesor.findOne({ where: { emailProfesor: email } });
       if (findUser) {
-        return res.status(400).json({ msg: "Este usuario ya existe" });
+        return res.status(400).json({ msg: "Este usuario ya esta registrado" });
       }
 
       //Hashear el password

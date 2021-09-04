@@ -49,12 +49,62 @@ export const attBarraJabon = {
   Ninguno: "Ninguno",
 };
 
+export const ATRIBUTOS_CODE = {
+  "Variacion de color": 1,
+  "Empaque roto": 2,
+  "Textos ilegibles": 3,
+  Deforme: 4,
+  "Bolsa rota": 5,
+  "Textos incompletos": 6,
+  Suciedades: 7,
+  "Barra partida": 8,
+  "Sellos irregulares": 9,
+  Doblado: 10,
+  "Etiqueta suelta": 11,
+  "Envase sucio": 12,
+  "Tapa floja": 13,
+  Ninguno: 14,
+  "Variacion de color barra": 15,
+  "Variacion de color empaque": 16,
+};
+
+export const GRAFICOS_CODE = {
+  Media: 1,
+  Rango: 2,
+  "Desviación estandar": 3,
+  "P con n constante": 4,
+  "P con n variable": 5,
+  NP: 6,
+  C: 7,
+  "U con n constante": 8,
+  "U con n variable": 9,
+};
+
+export const METHODS_CODE = {
+  1: "K",
+  2: "M",
+  3: "Rango",
+};
+
+export const selectedGraphic = {
+  1: "variable",
+  2: "variable",
+  3: "variable",
+  4: "constante",
+  5: "aleatorio",
+  6: "constante",
+  7: "constante",
+  8: "constante",
+  9: "aleatorio",
+};
+
 const urlsrcModelJabon = process.env.URL_BARRA_JABON;
 const urlsrcModelChocolate = process.env.URL_BARRA_CHOCOLATE;
 const urlsrcModelArroz = process.env.URL_BOLSA_ARROZ;
 const urlsrcModelPitillo = process.env.URL_PITILLO;
 const urlsrcModelRefresco = process.env.URL_REFRESCO;
 
+// Rutas de los modelos
 export const barraJabonModelsSrc = {
   poster_jabon: `${urlsrcModelJabon}/poster_jabon.png`,
   Barra_jabon_barra_deforme: `${urlsrcModelJabon}/Barra_jabon_barra_deforme.glb`,
@@ -161,53 +211,4 @@ export const refrescosModelsSrc = {
   Refresco_tapa_floja_envase_sucio_texto_ilegible: `${urlsrcModelRefresco}/Refresco_tapa_floja_envase_sucio_texto_ilegible.glb`,
   Refresco_tapa_floja_texto_ilegible: `${urlsrcModelRefresco}/Refresco_tapa_floja_texto_ilegible.glb`,
   Refresco_texto_ilegible: `${urlsrcModelRefresco}/Refresco_texto_ilegible.glb`,
-};
-
-export const ATRIBUTOS_CODE = {
-  "Variacion de color": 1,
-  "Empaque roto": 2,
-  "Textos ilegibles": 3,
-  Deforme: 4,
-  "Bolsa rota": 5,
-  "Textos incompletos": 6,
-  Suciedades: 7,
-  "Barra partida": 8,
-  "Sellos irregulares": 9,
-  Doblado: 10,
-  "Etiqueta suelta": 11,
-  "Envase sucio": 12,
-  "Tapa floja": 13,
-  Ninguno: 14,
-  "Variacion de color barra": 15,
-  "Variacion de color empaque": 16,
-};
-
-export const GRAFICOS_CODE = {
-  Media: 1,
-  Rango: 2,
-  "Desviación estandar": 3,
-  "P con n constante": 4,
-  "P con n variable": 5,
-  NP: 6,
-  C: 7,
-  "U con n constante": 8,
-  "U con n variable": 9,
-};
-
-export const METHODS_CODE = {
-  1: "K",
-  2: "M",
-  3: "Rango",
-};
-
-export const selectedGraphic = {
-  1: "variable",
-  2: "variable",
-  3: "variable",
-  4: "constante",
-  5: "aleatorio",
-  6: "constante",
-  7: "constante",
-  8: "constante",
-  9: "aleatorio",
 };

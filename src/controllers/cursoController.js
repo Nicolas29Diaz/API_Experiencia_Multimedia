@@ -1,29 +1,31 @@
 import { sequelize } from "../config/database";
 import Curso from "../Models/Curso";
 
-export async function insertCourse(req, res) {
-  const { nombreCurso, periodoAcademico, idProfesorC } = req.body;
+export async function createCourse(req, res) {
+  const { nombreCurso, periodoAcademico } = req.body;
   try {
     const curso = await Curso.create(
       {
         nombreCurso,
         periodoAcademico,
-        idProfesorC,
+        idProfesorC: req.user.id,
       },
       { fields: ["nombreCurso", "periodoAcademico", "idProfesorC"] }
     );
-    res.json(curso);
+    res.json({ curso });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ msg: "Hubo un problema al crear el curso" });
   }
 }
 
 export async function getAllCourses(req, res) {
   try {
-    const cursos = await Curso.findAll();
-    res.json(cursos);
+    const cursos = await Curso.findAll({ where: { idProfesorC: req.user.id } });
+    res.json({ cursos });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ msg: "Hubo un problema al obtener los cursos" });
   }
 }
 

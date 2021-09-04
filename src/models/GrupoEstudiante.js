@@ -21,6 +21,10 @@ const GrupoEstudiante = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    finalizado: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
   },
   { tableName: "grupo_estudiante", timestamps: false }
 );

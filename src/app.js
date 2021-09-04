@@ -25,7 +25,7 @@ app.use("/api/usuario", usuarioRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/profesor", profesorRoutes);
 app.use("/api/cursos", cursoRoutes);
-app.use("/api/practica", practicaRoutes);
+app.use("/api/practicas", practicaRoutes);
 app.use("/api/grupo", grupoRoutes);
 app.use("/api/estudiante", estudianteRoutes);
 app.use("/api/producto", productoRoutes);

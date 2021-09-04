@@ -19,6 +19,7 @@ const ProductoCorte3 = sequelize.define(
     aql: { type: DataTypes.STRING(20) },
     severidad: { type: DataTypes.STRING(25) },
     nivelInspeccion: { type: DataTypes.STRING(25) },
+    tipoMuestreo: { type: DataTypes.STRING(15) },
     idGrupoEstudiantePC3: {
       type: DataTypes.INTEGER,
       allowNull: false,

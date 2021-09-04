@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  insertCourse,
+  createCourse,
   getAllCourses,
   getOneCourse,
   getCourseByTeacher,
@@ -8,15 +8,17 @@ import {
   getStudentCourse,
   getCourseStudent,
 } from "../controllers/cursoController";
+import { verifyUser } from "../middleware/auth";
 
 const router = Router();
 
+// /api/cursos
+
 // Inserciones
-router.post("/", insertCourse);
+router.post("/", verifyUser, createCourse);
 
 // Consultas
-// /api/curso
-router.get("/", getAllCourses);
+router.get("/", verifyUser, getAllCourses);
 // Obetener la información de un curso
 router.get("/:idCurso", getOneCourse);
 // Conocer que cursos pertenecen a un profesor

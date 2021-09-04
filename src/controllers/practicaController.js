@@ -1,6 +1,6 @@
+import { sequelize } from "../config/database";
 import Grupo from "../models/Grupo";
 import Practica from "../models/Practica";
-import { getRandomMinMax } from "../helpers";
 import GrupoEstudiante from "../models/GrupoEstudiante";
 import GraficoPractica from "../models/GraficoPractica";
 import ProductoAtributo1 from "../models/ProductoAtributo1";
@@ -11,19 +11,29 @@ import ProductoCorte2 from "../models/ProductoCorte2";
 import ProductoCorte3 from "../models/ProductoCorte3";
 import Subgrupo from "../Models/Subgrupo";
 import SubgrupoProducto from "../models/SubgrupoProducto";
+import MetodoProducto from "../models/MetodoProducto";
 import {
   ALEATORIO,
   CONSTANTE,
   VARIABLE,
   selectedGraphic,
+  ATRIBUTOS_CODE,
+  ATRIBUTO,
+  BOLSA_ARROZ,
+  REFRESCOS,
+  BARRA_CHOCOLATE,
+  BARRA_JABON,
+  PITILLOS,
 } from "../constants/index";
-import MetodoProducto from "../models/MetodoProducto";
+
+import { extractNameProductFromArray, getRandomMinMax } from "../helpers";
 
 export async function createPractice1(req, res) {
   try {
     const {
       field: { nombrePractica, descripcion, modulo },
-      groups: { group, numGrupo },
+      groups,
+      parseIntIdCurso,
     } = req.body;
 
     const idCorteP = modulo.value;
@@ -33,7 +43,7 @@ export async function createPractice1(req, res) {
         nombrePractica,
         descripcionPractica: descripcion,
         idCorteP,
-        idCursoP: 2,
+        idCursoP: parseIntIdCurso,
       },
       {
         fields: [
@@ -45,9 +55,9 @@ export async function createPractice1(req, res) {
       }
     );
 
-    for (let i = 0; i < numGrupo.value; i++) {
+    for (let i = 0; i < groups.length; i++) {
       const { producto, unidades, tolerancia, integrantes, cont, atributos } =
-        group[i];
+        groups[i];
       const nombreGrupo = `Grupo ${i + 1}`;
 
       const grupo = await Grupo.create(
@@ -62,9 +72,10 @@ export async function createPractice1(req, res) {
         const grupoEstudiante = await GrupoEstudiante.create(
           {
             idGrupoGE: grupo.dataValues.idGrupo,
-            idEstudianteGE: integrantes[j].id,
+            idEstudianteGE: integrantes[j].idEstudiante,
+            finalizado: 0,
           },
-          { fields: ["idGrupoGE", "idEstudianteGE"] }
+          { fields: ["idGrupoGE", "idEstudianteGE", "finalizado"] }
         );
 
         const referenceProduct = await ProductoCorte1.create(
@@ -98,7 +109,7 @@ export async function createPractice1(req, res) {
       }
     }
 
-    res.status(200).json("Practica creada con exito");
+    res.status(200).json({ idPractica: practica.dataValues.idPractica });
   } catch (error) {
     res.status(500).json("Hubo un error");
     console.log(error);
@@ -114,7 +125,8 @@ export async function createPractice2(req, res) {
         modulo: { value },
         graficos,
       },
-      groups: { group, numGrupo },
+      groups,
+      parseIntIdCurso,
     } = req.body;
 
     const getGraphics = graficos.map((grafico) => grafico.value);
@@ -129,7 +141,7 @@ export async function createPractice2(req, res) {
         nombrePractica,
         descripcionPractica: descripcion,
         idCorteP: value,
-        idCursoP: 2,
+        idCursoP: parseIntIdCurso,
       },
       {
         fields: [
@@ -151,7 +163,7 @@ export async function createPractice2(req, res) {
       );
     }
 
-    for (let i = 0; i < numGrupo.value; i++) {
+    for (let i = 0; i < groups.length; i++) {
       const {
         producto,
         subgrupo,
@@ -160,7 +172,7 @@ export async function createPractice2(req, res) {
         integrantes,
         cont,
         atributos,
-      } = group[i];
+      } = groups[i];
       const nombreGrupo = `Grupo ${i + 1}`;
 
       const grupo = await Grupo.create(
@@ -175,9 +187,10 @@ export async function createPractice2(req, res) {
         const grupoEstudiante = await GrupoEstudiante.create(
           {
             idGrupoGE: grupo.dataValues.idGrupo,
-            idEstudianteGE: integrantes[j].id,
+            idEstudianteGE: integrantes[j].idEstudiante,
+            finalizado: 0,
           },
-          { fields: ["idGrupoGE", "idEstudianteGE"] }
+          { fields: ["idGrupoGE", "idEstudianteGE", "finalizado"] }
         );
 
         const referenceProduct = await ProductoCorte2.create(
@@ -313,7 +326,7 @@ export async function createPractice2(req, res) {
       }
     }
 
-    res.json("Practica creada satisfactoriamente");
+    res.json({ idPractica: practica.dataValues.idPractica });
   } catch (error) {
     console.log(error);
   }
@@ -328,7 +341,8 @@ export async function createPractice3(req, res) {
         modulo: { value },
         tipoMuestreo,
       },
-      groups: { group, numGrupo },
+      groups,
+      parseIntIdCurso,
     } = req.body;
 
     const practica = await Practica.create(
@@ -336,7 +350,7 @@ export async function createPractice3(req, res) {
         nombrePractica,
         descripcionPractica: descripcion,
         idCorteP: value,
-        idCursoP: 2,
+        idCursoP: parseIntIdCurso,
       },
       {
         fields: [
@@ -348,7 +362,7 @@ export async function createPractice3(req, res) {
       }
     );
 
-    for (let i = 0; i < numGrupo.value; i++) {
+    for (let i = 0; i < groups.length; i++) {
       const {
         producto,
         tolerancia,
@@ -360,7 +374,7 @@ export async function createPractice3(req, res) {
         integrantes,
         metodo,
         atributos,
-      } = group[i];
+      } = groups[i];
       const nombreGrupo = `Grupo ${i + 1}`;
 
       const getMethods = metodo && metodo.map((metodo) => metodo.value);
@@ -377,9 +391,10 @@ export async function createPractice3(req, res) {
         const grupoEstudiante = await GrupoEstudiante.create(
           {
             idGrupoGE: grupo.dataValues.idGrupo,
-            idEstudianteGE: integrantes[j].id,
+            idEstudianteGE: integrantes[j].idEstudiante,
+            finalizado: 0,
           },
-          { fields: ["idGrupoGE", "idEstudianteGE"] }
+          { fields: ["idGrupoGE", "idEstudianteGE", "finalizado"] }
         );
 
         const referenceProduct = await ProductoCorte3.create(
@@ -394,6 +409,7 @@ export async function createPractice3(req, res) {
             severidad: severidad.value,
             nivelInspeccion: nivelInspeccion.value,
             idGrupoEstudiantePC3: grupoEstudiante.dataValues.idGrupoEstudiante,
+            tipoMuestreo,
           },
           {
             fields: [
@@ -405,12 +421,23 @@ export async function createPractice3(req, res) {
               "variablePrincipalC3",
               "toleranciaPC3",
               "idGrupoEstudiantePC3",
+              "tipoMuestreo",
             ],
           }
         );
 
-        if (atributos?.length > 0) {
-          console.log("entré atributos");
+        if (tipoMuestreo === VARIABLE) {
+          await ProductoAtributo3.create(
+            {
+              idAtributoPA3: ATRIBUTOS_CODE["Ninguno"],
+              idProductoC3A: referenceProduct.dataValues.idProductoC3,
+            },
+            { fields: ["idAtributoPA3", "idProductoC3A"] }
+          );
+        }
+
+        if (tipoMuestreo === ATRIBUTO && atributos?.length > 0) {
+          console.log("tengo muchos atributos");
           for (let attribute = 0; attribute < atributos.length; attribute++) {
             await ProductoAtributo3.create(
               {
@@ -423,8 +450,6 @@ export async function createPractice3(req, res) {
         }
 
         if (getMethods?.length > 0) {
-          console.log("entré métodos");
-
           for (
             let indexMethod = 0;
             indexMethod < getMethods.length;
@@ -439,17 +464,347 @@ export async function createPractice3(req, res) {
       }
     }
 
-    res.json("Insertado con exito");
+    res.json({ idPractica: practica.dataValues.idPractica });
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: "Hubo un error" });
   }
 }
 
-export async function getAllPractica(req, res) {
+export async function getAllPractices(req, res) {
   try {
-    const practicas = await Practica.findAll();
-    res.json(practicas);
+    const { idCurso } = req.params;
+    const practices = await sequelize.query(
+      `select pa.idPractica, pa.nombrePractica, pa.idCorteP 
+      from practica pa, curso cu, profesor p 
+      where p.idProfesor=cu.idProfesorC and cu.idCurso=pa.idCursoP
+      and p.idProfesor=${req.user.id} and cu.idCurso=${idCurso};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    res.json({ practices });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getPractice1InfoTeacher(req, res) {
+  try {
+    const { idPractica } = req.params;
+
+    const groupsInfo = await sequelize.query(
+      `select g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1,
+              p.toleranciaPC1,group_concat(distinct " ",a.nombreAtributo) as atributos,
+              group_concat( distinct concat(" ",e.nombreEstudiante, " ",e.apellidoEstudiante)separator ',')  as estudiantes
+        from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante ge, estudiante e, 
+		          grupo g, practica pa 
+        where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and 
+              p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and 
+              ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} group by g.idGrupo;
+      `,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    let grupos = [];
+    let arrozArray = [];
+    let refrescosArray = [];
+    let jabonArray = [];
+    let chocolateArray = [];
+    let pitillosArray = [];
+
+    for (let i = 0; i < groupsInfo.length; i++) {
+      const {
+        idGrupo,
+        nombrePC1,
+        unidadesPC1,
+        variablePrincipalC1,
+        toleranciaPC1,
+        atributos,
+        estudiantes,
+      } = groupsInfo[i];
+
+      let grupo = {
+        idGrupo,
+        nombreProducto: nombrePC1,
+        info: {
+          unidades: unidadesPC1,
+          variable: variablePrincipalC1,
+          tolerancia: toleranciaPC1,
+          atributos,
+        },
+        estudiantes,
+      };
+
+      if (nombrePC1 === BOLSA_ARROZ) {
+        arrozArray.push(grupo);
+      }
+      if (nombrePC1 === REFRESCOS) {
+        refrescosArray.push(grupo);
+      }
+      if (nombrePC1 === BARRA_JABON) {
+        jabonArray.push(grupo);
+      }
+      if (nombrePC1 === PITILLOS) {
+        pitillosArray.push(grupo);
+      }
+      if (nombrePC1 === BARRA_CHOCOLATE) {
+        chocolateArray.push(grupo);
+      }
+    }
+
+    // Añade el producto al arreglo de grupos
+    const populateArrayGroups = (actualProduct, newArray) =>
+      grupos.push({ nombreProducto: actualProduct, productos: newArray });
+
+    if (Array.isArray(arrozArray) && arrozArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(arrozArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(refrescosArray) && refrescosArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(refrescosArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(jabonArray) && jabonArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(jabonArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(pitillosArray) && pitillosArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(pitillosArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(chocolateArray) && chocolateArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(chocolateArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+
+    // TODO: conocer si un grupo ha terminado la practica
+
+    res.json({ grupos });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getPractice2InfoTeacher(req, res) {
+  try {
+    const { idPractica } = req.params;
+
+    const groupsInfo = await sequelize.query(
+      `select g.idGrupo, count(s.idSubgrupo) as subgrupos,s.cantidadSubgrupo, p.nombrePC2, p.variablePrincipalC2,
+              p.toleranciaPC2,group_concat(distinct " ",a.nombreAtributo) as atributos,
+              group_concat( distinct concat(" ",e.nombreEstudiante, " ",e.apellidoEstudiante)separator ',')  as estudiantes
+      from atributo a, producto_atributo_2 pa2, producto_corte_2 p,subgrupo s, subgrupo_producto sp, 
+            grupo_estudiante ge, estudiante e,grupo g, practica pa 
+      where a.idAtributo=pa2.idAtributoPA2 and 
+            pa2.idProductoC2A=p.idProductoC2 and 
+            sp.idSubgrupoSP= s.idSubgrupo and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante
+            and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and 
+            g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} group by g.idGrupo;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    let grupos = [];
+    let arrozArray = [];
+    let refrescosArray = [];
+    let jabonArray = [];
+    let chocolateArray = [];
+    let pitillosArray = [];
+
+    for (let i = 0; i < groupsInfo.length; i++) {
+      const {
+        idGrupo,
+        subgrupos,
+        cantidadSubgrupo,
+        nombrePC2,
+        variablePrincipalC2,
+        toleranciaPC2,
+        atributos,
+        estudiantes,
+      } = groupsInfo[i];
+
+      let grupo = {
+        idGrupo,
+        nombreProducto: nombrePC2,
+        infoSubgs: {
+          subgrupos,
+          cantidadSubgrupo,
+        },
+        info: {
+          variable: variablePrincipalC2,
+          tolerancia: toleranciaPC2,
+          atributos,
+        },
+        estudiantes,
+      };
+
+      if (nombrePC2 === BOLSA_ARROZ) {
+        arrozArray.push(grupo);
+      }
+      if (nombrePC2 === REFRESCOS) {
+        refrescosArray.push(grupo);
+      }
+      if (nombrePC2 === BARRA_JABON) {
+        jabonArray.push(grupo);
+      }
+      if (nombrePC2 === PITILLOS) {
+        pitillosArray.push(grupo);
+      }
+      if (nombrePC2 === BARRA_CHOCOLATE) {
+        chocolateArray.push(grupo);
+      }
+    }
+
+    // Añade el producto al arreglo de grupos
+    const populateArrayGroups = (actualProduct, newArray) =>
+      grupos.push({ nombreProducto: actualProduct, productos: newArray });
+
+    if (Array.isArray(arrozArray) && arrozArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(arrozArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(refrescosArray) && refrescosArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(refrescosArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(jabonArray) && jabonArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(jabonArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(pitillosArray) && pitillosArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(pitillosArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(chocolateArray) && chocolateArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(chocolateArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+
+    res.json({ grupos });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getPractice3InfoTeacher(req, res) {
+  try {
+    const { idPractica } = req.params;
+
+    const groupsInfo = await sequelize.query(
+      `select g.idGrupo,p.nombrePC3, p.variablePrincipalC3, p.toleranciaPC3, p.tamanioLote, p.aql,p.severidad, p.nivelInspeccion,
+       (case when p.tipoMuestreo='atributo' then group_concat(distinct " ",a.nombreAtributo)  else "ninguno" end) as atributos,
+       (case when p.tipoMuestreo='variable' then group_concat(distinct m.nombreMetodo separator ',')  else "ninguno" end) as metodos,
+       group_concat( distinct concat(" ",e.nombreEstudiante ," ",e.apellidoEstudiante)separator ',') as estudiantes 
+       from metodo m, metodo_producto mp, atributo a, producto_atributo_3 pa3, producto_corte_3 p,grupo_estudiante ge,
+       estudiante e,grupo g, practica pa where a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and 
+       p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and 
+       g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} group by g.idGrupo;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    let grupos = [];
+    let arrozArray = [];
+    let refrescosArray = [];
+    let jabonArray = [];
+    let chocolateArray = [];
+    let pitillosArray = [];
+
+    for (let i = 0; i < groupsInfo.length; i++) {
+      const {
+        idGrupo,
+        nombrePC3,
+        variablePrincipalC3,
+        toleranciaPC3,
+        tamanioLote,
+        aql,
+        severidad,
+        nivelInspeccion,
+        atributos,
+        metodos,
+        estudiantes,
+      } = groupsInfo[i];
+
+      let grupo = {
+        idGrupo,
+        nombreProducto: nombrePC3,
+        infoExtra: {
+          tamanioLote,
+          ...(metodos !== "ninguno" && { metodos }),
+        },
+        info: {
+          ...(variablePrincipalC3 !== null && {
+            variable: variablePrincipalC3,
+          }),
+          ...(toleranciaPC3 !== null && { tolerancia: toleranciaPC3 }),
+          aql,
+          severidad,
+          "Nivel de inspeccion": nivelInspeccion,
+          ...(atributos !== "ninguno" && { atributos }),
+        },
+        estudiantes,
+      };
+
+      if (nombrePC3 === BOLSA_ARROZ) {
+        arrozArray.push(grupo);
+      }
+      if (nombrePC3 === REFRESCOS) {
+        refrescosArray.push(grupo);
+      }
+      if (nombrePC3 === BARRA_JABON) {
+        jabonArray.push(grupo);
+      }
+      if (nombrePC3 === PITILLOS) {
+        pitillosArray.push(grupo);
+      }
+      if (nombrePC3 === BARRA_CHOCOLATE) {
+        chocolateArray.push(grupo);
+      }
+    }
+
+    // Añade el producto al arreglo de grupos
+    const populateArrayGroups = (actualProduct, newArray) =>
+      grupos.push({ nombreProducto: actualProduct, productos: newArray });
+
+    if (Array.isArray(arrozArray) && arrozArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(arrozArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(refrescosArray) && refrescosArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(refrescosArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(jabonArray) && jabonArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(jabonArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(pitillosArray) && pitillosArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(pitillosArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+    if (Array.isArray(chocolateArray) && chocolateArray.length) {
+      const { actualProduct, newArray } =
+        extractNameProductFromArray(chocolateArray);
+      populateArrayGroups(actualProduct, newArray);
+    }
+
+    // const BannerInfo = await sequelize.query(
+    //   `select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
+    //   { type: sequelize.QueryTypes.SELECT }
+    // );
+
+    res.json({ grupos });
   } catch (error) {
     console.log(error);
   }

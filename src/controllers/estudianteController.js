@@ -36,8 +36,21 @@ export async function insertStudent(req, res) {
 
 export async function getAllStudents(req, res) {
   try {
-    const estudiantes = await Estudiante.findAll();
-    res.json(estudiantes);
+    const estudiantes = await Estudiante.findAll({
+      attributes: [
+        "idEstudiante",
+        [
+          sequelize.fn(
+            "CONCAT",
+            sequelize.col("nombreEstudiante"),
+            " ",
+            sequelize.col("apellidoEstudiante")
+          ),
+          "estudiante",
+        ],
+      ],
+    });
+    res.json({ estudiantes });
   } catch (error) {
     console.log(error);
   }

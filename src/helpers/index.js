@@ -26,3 +26,15 @@ export async function hashedPassword(password) {
 export async function comparePassword(passwordRecieved, passwordDB) {
   return await bcrypsjs.compareSync(passwordRecieved, passwordDB);
 }
+
+export function extractNameProductFromArray(newArray) {
+  // Se obtiene el nombre del producto del primer elemento
+  let [actualProduct] = newArray.map((a) => a.nombreProducto);
+
+  // se elemina la propiedad nombreProducto del newArray
+  newArray.map((a) => delete a.nombreProducto);
+  return {
+    actualProduct,
+    newArray,
+  };
+}

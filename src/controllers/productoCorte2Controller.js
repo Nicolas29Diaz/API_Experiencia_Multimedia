@@ -12,6 +12,7 @@ import {
   CONSTANTE,
 } from "../constants/index";
 import { getModels } from "../productModels";
+import { getPosterImages } from "../productModels/getPosterImages";
 
 export async function createInspectionProductC2(req, res) {
   try {
@@ -187,9 +188,13 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
         getSubgroupsIds[sp];
 
       const product = await sequelize.query(
-        `select p.idProductoC2, p.nombrePC2,p.variablePrincipalC2,p.variableSecundariaC2,group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_2 pa2, subgrupo s, subgrupo_producto sp, producto_corte_2 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa2.idAtributoPA2 and pa2.idProductoC2A=p.idProductoC2 and s.idSubgrupo=sp.idSubgrupoSP and sp.idProductoC2SP=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and s.idSubgrupo=${idSubgrupo} and pa.idPractica=${idPractica} and e.idEstudiante=${idEstudiante} group by p.idProductoC2 order by p.idProductoC2 limit ${cantidadSubgrupo} offset 1;`,
+        `select p.idProductoC2, p.nombrePC2,p.variablePrincipalC2,p.variableSecundariaC2,group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_2 pa2, subgrupo s, subgrupo_producto sp, producto_corte_2 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa2.idAtributoPA2 and pa2.idProductoC2A=p.idProductoC2 and s.idSubgrupo=sp.idSubgrupoSP and sp.idProductoC2SP=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and s.idSubgrupo=${idSubgrupo} group by p.idProductoC2 order by p.idProductoC2 limit ${cantidadSubgrupo} offset 1;`,
         { type: sequelize.QueryTypes.SELECT }
       );
+      // Se obtiene el poster o imagen del producto
+      const [productActual] = product;
+      const image = productActual.nombrePC2;
+      let getImage = getPosterImages(image);
 
       const mapProduct = product.map(
         ({
@@ -228,12 +233,13 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
       if (tipoSubgrupo === VARIABLE) {
         AtributoNVariable.push(newSubgroup);
       }
+      productsSubgroup = {
+        ...(AtributoNAleatorio.length > 0 && { AtributoNAleatorio }),
+        ...(AtributoNConstante.length > 0 && { AtributoNConstante }),
+        ...(AtributoNVariable.length > 0 && { AtributoNVariable }),
+        poster: getImage,
+      };
     }
-    productsSubgroup = {
-      ...(AtributoNAleatorio.length > 0 && { AtributoNAleatorio }),
-      ...(AtributoNConstante.length > 0 && { AtributoNConstante }),
-      ...(AtributoNVariable.length > 0 && { AtributoNVariable }),
-    };
 
     res.json(productsSubgroup);
   } catch (error) {
@@ -247,21 +253,6 @@ export async function getAllProductsC2(req, res) {
     const productosCorte2 = await ProductoCorte2.findAll();
     res.json(productosCorte2);
   } catch (error) {
-    console.log(error);
-  }
-}
-
-export async function getOneProductC2(req, res) {
-  try {
-    const { idProductoC2 } = req.params;
-    const productoCorte2 = await ProductoCorte2.findOne({
-      where: {
-        idProductoC2,
-      },
-    });
-    res.json(productoCorte2);
-  } catch (error) {
-    res.status(500).json({ msg: "Hubo un error" });
     console.log(error);
   }
 }

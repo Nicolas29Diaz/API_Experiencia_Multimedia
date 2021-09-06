@@ -24,6 +24,7 @@ import {
   BARRA_CHOCOLATE,
   BARRA_JABON,
   PITILLOS,
+  PRODUCT_UNITS,
 } from "../constants/index";
 
 import { extractNameProductFromArray, getRandomMinMax } from "../helpers";
@@ -131,11 +132,6 @@ export async function createPractice2(req, res) {
 
     const getGraphics = graficos.map((grafico) => grafico.value);
 
-    // Contadores que permite identificar el tipo de grafico para crear los subgrupos
-    let contConstant = 1;
-    let contVariable = 1;
-    let contRandom = 1;
-
     const practica = await Practica.create(
       {
         nombrePractica,
@@ -227,10 +223,7 @@ export async function createPractice2(req, res) {
         ) {
           // Si el profesor elige un grafico de tipo aleatorio
 
-          if (
-            contRandom === 1 &&
-            selectedGraphic[getGraphics[indexGraphic]] === ALEATORIO
-          ) {
+          if (selectedGraphic[getGraphics[indexGraphic]] === ALEATORIO) {
             for (let s = 0; s < subgrupo; s++) {
               const createSubgroup = await Subgrupo.create(
                 {
@@ -255,14 +248,10 @@ export async function createPractice2(req, res) {
                 { fields: ["idProductoC2SP", "idSubgrupoSP"] }
               );
             }
-            contRandom--;
           }
           // Si el profesor elige un grafico de tipo constante
 
-          if (
-            contConstant === 1 &&
-            selectedGraphic[getGraphics[indexGraphic]] === CONSTANTE
-          ) {
+          if (selectedGraphic[getGraphics[indexGraphic]] === CONSTANTE) {
             for (let s = 0; s < subgrupo; s++) {
               const createSubgroup = await Subgrupo.create(
                 {
@@ -287,14 +276,10 @@ export async function createPractice2(req, res) {
                 { fields: ["idProductoC2SP", "idSubgrupoSP"] }
               );
             }
-            contConstant--;
           }
           // Si el profesor elige un grafico de tipo variable
 
-          if (
-            contVariable === 1 &&
-            selectedGraphic[getGraphics[indexGraphic]] === VARIABLE
-          ) {
+          if (selectedGraphic[getGraphics[indexGraphic]] === VARIABLE) {
             for (let s = 0; s < subgrupo; s++) {
               const createSubgroup = await Subgrupo.create(
                 {
@@ -319,8 +304,6 @@ export async function createPractice2(req, res) {
                 { fields: ["idProductoC2SP", "idSubgrupoSP"] }
               );
             }
-
-            contVariable--;
           }
         }
       }
@@ -491,6 +474,11 @@ export async function getPractice1InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
 
+    const bannerInfo = await sequelize.query(
+      `   select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
     const groupsInfo = await sequelize.query(
       `select g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1,
               p.toleranciaPC1,group_concat(distinct " ",a.nombreAtributo) as atributos,
@@ -527,7 +515,7 @@ export async function getPractice1InfoTeacher(req, res) {
         nombreProducto: nombrePC1,
         info: {
           unidades: unidadesPC1,
-          variable: variablePrincipalC1,
+          variable: `${variablePrincipalC1} ${PRODUCT_UNITS[nombrePC1]}`,
           tolerancia: toleranciaPC1,
           atributos,
         },
@@ -583,7 +571,7 @@ export async function getPractice1InfoTeacher(req, res) {
 
     // TODO: conocer si un grupo ha terminado la practica
 
-    res.json({ grupos });
+    res.json({ bannerInfo, grupos });
   } catch (error) {
     console.log(error);
   }
@@ -593,8 +581,13 @@ export async function getPractice2InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
 
+    const bannerInfo = await sequelize.query(
+      `select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ',') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=2 group by pa.idPractica;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
     const groupsInfo = await sequelize.query(
-      `select g.idGrupo, count(s.idSubgrupo) as subgrupos,s.cantidadSubgrupo, p.nombrePC2, p.variablePrincipalC2,
+      `select g.idGrupo, count(distinct s.idSubgrupo) as subgrupos,s.cantidadSubgrupo, p.nombrePC2, p.variablePrincipalC2,
               p.toleranciaPC2,group_concat(distinct " ",a.nombreAtributo) as atributos,
               group_concat( distinct concat(" ",e.nombreEstudiante, " ",e.apellidoEstudiante)separator ',')  as estudiantes
       from atributo a, producto_atributo_2 pa2, producto_corte_2 p,subgrupo s, subgrupo_producto sp, 
@@ -634,7 +627,7 @@ export async function getPractice2InfoTeacher(req, res) {
           cantidadSubgrupo,
         },
         info: {
-          variable: variablePrincipalC2,
+          variable: `${variablePrincipalC2} ${PRODUCT_UNITS[nombrePC2]}`,
           tolerancia: toleranciaPC2,
           atributos,
         },
@@ -698,6 +691,10 @@ export async function getPractice3InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
 
+    const bannerInfo = await sequelize.query(
+      `   select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
     const groupsInfo = await sequelize.query(
       `select g.idGrupo,p.nombrePC3, p.variablePrincipalC3, p.toleranciaPC3, p.tamanioLote, p.aql,p.severidad, p.nivelInspeccion,
        (case when p.tipoMuestreo='atributo' then group_concat(distinct " ",a.nombreAtributo)  else "ninguno" end) as atributos,
@@ -741,7 +738,7 @@ export async function getPractice3InfoTeacher(req, res) {
         },
         info: {
           ...(variablePrincipalC3 !== null && {
-            variable: variablePrincipalC3,
+            variable: `${variablePrincipalC3} ${PRODUCT_UNITS[nombrePC3]}`,
           }),
           ...(toleranciaPC3 !== null && { tolerancia: toleranciaPC3 }),
           aql,

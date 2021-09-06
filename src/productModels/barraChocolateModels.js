@@ -11,7 +11,7 @@ export const barraChocolateModels = (atributos) => {
   let isNothing = ishasAttribute(attBarraChocolate.Ninguno);
 
   if (isNothing) {
-    return attBarraChocolate.Barra_chocolate;
+    return barraChocolateModelsSrc.Barra_chocolate;
   }
 
   if (lengthAttributes === 1) {

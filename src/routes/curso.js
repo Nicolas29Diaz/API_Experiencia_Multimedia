@@ -20,7 +20,7 @@ router.post("/", verifyUser, createCourse);
 // Consultas
 router.get("/", verifyUser, getAllCourses);
 // Obetener la información de un curso
-router.get("/:idCurso", getOneCourse);
+router.get("/:idCurso", verifyUser, getOneCourse);
 // Conocer que cursos pertenecen a un profesor
 router.get("/profesor/:idProfesorC", getCourseByTeacher);
 // Conocer que practicas tiene asignadas un curso especifico:

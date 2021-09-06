@@ -13,7 +13,7 @@ export const barraJabonModels = (atributos) => {
   let isNothing = ishasAttribute(attBarraJabon.Ninguno);
 
   if (isNothing) {
-    return attBarraJabon.Barra_jabon_buena;
+    return barraJabonModelsSrc.Barra_jabon_buena;
   }
 
   if (lengthAttributes === 1) {

@@ -8,6 +8,14 @@ export const ALEATORIO = "aleatorio";
 export const VARIABLE = "variable";
 export const ATRIBUTO = "atributo";
 
+export const PRODUCT_UNITS = {
+  [REFRESCOS]: "ml",
+  [BOLSA_ARROZ]: "grs",
+  [BARRA_CHOCOLATE]: "grs",
+  [BARRA_JABON]: "grs",
+  [PITILLOS]: "mm",
+};
+
 export const attRefrescos = {
   TextosIlegibles: "Textos ilegibles",
   EtiquetaSuelta: "Etiqueta suelta",

@@ -11,7 +11,7 @@ export const bolsaArrozModels = (atributos) => {
   let isNothing = ishasAttribute(attBolsaArroz.Ninguno);
 
   if (isNothing) {
-    return attBolsaArroz.Bolsa_arroz;
+    return bolsaArrozModelsSrc.Bolsa_arroz;
   }
 
   if (lengthAttributes === 1) {

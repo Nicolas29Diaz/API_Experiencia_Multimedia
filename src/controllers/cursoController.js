@@ -35,9 +35,10 @@ export async function getOneCourse(req, res) {
     const curso = await Curso.findOne({
       where: {
         idCurso,
+        idProfesorC: req.user.id,
       },
     });
-    res.json(curso);
+    res.json({ curso });
   } catch (error) {
     console.log(error);
   }

@@ -1,7 +1,15 @@
 import { sequelize } from "../config/database";
 import ProductoCorte1 from "../Models/ProductoCorte1";
 import { getRandomMinMax, getRandomAttributes } from "../helpers";
-import { REFRESCOS, BARRA_JABON, ATRIBUTOS_CODE } from "../constants/index";
+import {
+  REFRESCOS,
+  BARRA_JABON,
+  ATRIBUTOS_CODE,
+  PRODUCT_UNITS,
+  CANTIDAD_GAS,
+  RIQUEZA_GRASA,
+  VARIABLE_SECUNDARIA,
+} from "../constants/index";
 import ProductoAtributo1 from "../Models/ProductoAtributo1";
 import { getModels } from "../productModels";
 import { getPosterImages } from "../productModels/getPosterImages";
@@ -9,6 +17,15 @@ import { getPosterImages } from "../productModels/getPosterImages";
 export async function createInspectionProductC1(req, res) {
   try {
     const { idPractica, idEstudiante } = req.params;
+
+    const numberProductsCreated = await sequelize.query(
+      `select count(p.idProductoC1) as count from producto_corte_1 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and e.idEstudiante=${idEstudiante};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    const [actualNumberProduct] = numberProductsCreated;
+    const count = actualNumberProduct.count;
+    if (count > 1)
+      return res.status(200).json({ msg: "Los productos ya han sido creados" });
 
     const getStudentProduct = await sequelize.query(
       `select p.nombrePC1, p.variablePrincipalC1, p.toleranciaPC1, p.unidadesPC1, p.idGrupoEstudiantePC1, group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC1 limit 1;`,
@@ -61,10 +78,10 @@ export async function createInspectionProductC1(req, res) {
           variablePrincipalC1:
             variablePrincipalC1 + getRandomTolerancePrincipal,
           ...(isHasProductName === BARRA_JABON && {
-            variableSecundariaC1: 39 + getRandomToleranceSecondary,
+            variableSecundariaC1: RIQUEZA_GRASA + getRandomToleranceSecondary,
           }),
           ...(isHasProductName && {
-            variableSecundariaC1: 15 + getRandomToleranceSecondary,
+            variableSecundariaC1: CANTIDAD_GAS + getRandomToleranceSecondary,
           }),
           idGrupoEstudiantePC1,
         },
@@ -104,10 +121,10 @@ export async function createInspectionProductC1(req, res) {
           variablePrincipalC1:
             variablePrincipalC1 + getRandomTolerancePrincipal,
           ...(isHasProductName === BARRA_JABON && {
-            variableSecundariaC1: 39 + getRandomToleranceSecondary,
+            variableSecundariaC1: RIQUEZA_GRASA + getRandomToleranceSecondary,
           }),
           ...(isHasProductName && {
-            variableSecundariaC1: 15 + getRandomToleranceSecondary,
+            variableSecundariaC1: CANTIDAD_GAS + getRandomToleranceSecondary,
           }),
           idGrupoEstudiantePC1,
         },
@@ -136,7 +153,7 @@ export async function createInspectionProductC1(req, res) {
       }
     }
 
-    res.json("Insertados con exito");
+    res.json({ msg: "Creada con éxito" });
   } catch (error) {
     res.status(500).json("Hubo un error");
     console.log(error);
@@ -152,10 +169,53 @@ export async function getAllProductsC1(req, res) {
   }
 }
 
+export async function getFeatures(req, res) {
+  try {
+    const { idEstudiante, idPractica } = req.params;
+
+    const getInfo = await sequelize.query(
+      `select p.nombrePC1, p.variablePrincipalC1,p.variableSecundariaC1, p.toleranciaPC1, group_concat(a.nombreAtributo separator ', ') as atributos from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC1 limit 1;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const featuresArray = getInfo.map((feature) => {
+      const valueWithUnits = `${feature.variablePrincipalC1} ${
+        PRODUCT_UNITS[feature.nombrePC1]
+      } +- ${feature.toleranciaPC1}`;
+
+      const separteAtt = feature.atributos.split(",");
+      const attMap = separteAtt.map((att) => att);
+      console.log(attMap);
+
+      return {
+        feature: [
+          { name: "contenido", value: valueWithUnits },
+          {
+            ...(feature.variableSecundariaC1 !== null &&
+              VARIABLE_SECUNDARIA[feature.nombrePC1]),
+          },
+          { name: "atributos", value: feature.atributos },
+        ],
+      };
+    });
+
+    const features = featuresArray
+      .map((value) =>
+        value.feature.filter((value) => Object.keys(value).length !== 0)
+      )
+      .flat();
+
+    res.json({ features });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // Se obtienen los productos para la inspección
 export async function getPracticeOneProductInfoPerStudent(req, res) {
-  const { idEstudiante, idPractica } = req.params;
   try {
+    const { idEstudiante, idPractica } = req.params;
+
     let productsArray = [];
 
     const getProductsCount = await sequelize.query(
@@ -187,8 +247,10 @@ export async function getPracticeOneProductInfoPerStudent(req, res) {
         return {
           id: idProductoC1,
           nombre: nombrePC1,
-          variablePrincipal: variablePrincipalC1,
-          variableSecundaria: variableSecundariaC1,
+          variablePrincipal: `${variablePrincipalC1} ${PRODUCT_UNITS[nombrePC1]}`,
+          ...(variableSecundariaC1 !== null && {
+            variableSecundaria: variableSecundariaC1,
+          }),
           src: getModels(nombrePC1, separateAttributes),
           atributos,
         };

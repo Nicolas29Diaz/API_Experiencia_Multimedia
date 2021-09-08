@@ -18,6 +18,15 @@ export async function createInspectionProductC2(req, res) {
   try {
     const { idPractica, idEstudiante } = req.params;
 
+    const numberProductsCreated = await sequelize.query(
+      `select count(p.idProductoC2) as count from producto_corte_2 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and e.idEstudiante=${idEstudiante};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    const [actualNumberProduct] = numberProductsCreated;
+    const count = actualNumberProduct.count;
+    if (count > 1)
+      return res.json({ msg: "Los productos ya han sido creados" });
+
     const practiceProductsInfo = await sequelize.query(
       `select p.nombrePC2,p.variablePrincipalC2,p.toleranciaPC2,p.idGrupoEstudiantePC2,group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_2 pa2, producto_corte_2 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa2.idAtributoPA2 and pa2.idProductoC2A=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and e.idEstudiante=${idEstudiante} group by p.idProductoC2 limit 1;`,
       { type: sequelize.QueryTypes.SELECT }
@@ -198,6 +207,7 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
 
       const mapProduct = product.map(
         ({
+          idProductoC2,
           nombrePC2,
           variablePrincipalC2,
           variableSecundariaC2,
@@ -206,6 +216,7 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
           let separateAttributes = atributos.split(",");
 
           return {
+            id: idProductoC2,
             nombre: nombrePC2,
             variablePrincipal: variablePrincipalC2,
             variableSecundaria: variableSecundariaC2,
@@ -241,7 +252,7 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
       };
     }
 
-    res.json(productsSubgroup);
+    res.json({ productsSubgroup });
   } catch (error) {
     res.status(500).json({ msg: "Hubo un error" });
     console.log(error);

@@ -7,6 +7,7 @@ import {
   getPractice1InfoTeacher,
   getPractice2InfoTeacher,
   getPractice3InfoTeacher,
+  getAllPraticesByStudent,
 } from "../controllers/practicaController";
 const router = Router();
 import { verifyUser } from "../middleware/auth";
@@ -18,8 +19,14 @@ router.post("/corte3", verifyUser, createPractice3);
 // Consultas
 // api/practicas
 
-//practica 1
+//practica 1 profesor
 router.get("/practica1/:idPractica", verifyUser, getPractice1InfoTeacher);
+//practica 1 estudiante
+router.get(
+  "/practica1/estudiante/:idEstudiante",
+  verifyUser,
+  getAllPraticesByStudent
+);
 
 router.get("/practica2/:idPractica", verifyUser, getPractice2InfoTeacher);
 router.get("/practica3/:idPractica", verifyUser, getPractice3InfoTeacher);

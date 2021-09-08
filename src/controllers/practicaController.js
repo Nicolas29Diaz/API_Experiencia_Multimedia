@@ -27,8 +27,18 @@ import {
   PRODUCT_UNITS,
 } from "../constants/index";
 
-import { extractNameProductFromArray, getRandomMinMax } from "../helpers";
+import {
+  extractNameProductFromArray,
+  formatDate,
+  getRandomMinMax,
+} from "../helpers";
 
+/**
+ * Función que permite crear una práctica del corte 1
+ * @param {} req
+ * @param {} res
+ * @returns {idPractica}
+ */
 export async function createPractice1(req, res) {
   try {
     const {
@@ -117,6 +127,12 @@ export async function createPractice1(req, res) {
   }
 }
 
+/**
+ * Función que permite crear una práctica del corte 2
+ * @param {} req
+ * @param {} res
+ * @returns {idPractica}
+ */
 export async function createPractice2(req, res) {
   try {
     const {
@@ -315,6 +331,12 @@ export async function createPractice2(req, res) {
   }
 }
 
+/**
+ * Función que permite crear una práctica del corte 3
+ * @param {} req
+ * @param {} res
+ * @returns {idPractica}
+ */
 export async function createPractice3(req, res) {
   try {
     const {
@@ -454,6 +476,13 @@ export async function createPractice3(req, res) {
   }
 }
 
+/**
+ * Función que permite obtener todas las práticas creadas por un docente especifico para un curso
+ * @param {} req
+ * @param {} res
+ * @returns {pratices}
+ */
+
 export async function getAllPractices(req, res) {
   try {
     const { idCurso } = req.params;
@@ -470,6 +499,11 @@ export async function getAllPractices(req, res) {
   }
 }
 
+/** Función que permite traer la información de una practica del corte 1 para el docente
+ * @param {} req
+ * @param {} res
+ * @returns {bannerInfo,grupos}
+ */
 export async function getPractice1InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
@@ -577,6 +611,11 @@ export async function getPractice1InfoTeacher(req, res) {
   }
 }
 
+/** Función que permite traer la información de una practica del corte 2 para el docente
+ * @param {} req
+ * @param {} res
+ * @returns {grupos}
+ */
 export async function getPractice2InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
@@ -687,6 +726,12 @@ export async function getPractice2InfoTeacher(req, res) {
   }
 }
 
+/**
+ * Función que permite traer la información de una practica del corte 3para el docente
+ * @param {*} req
+ * @param {*} res
+ * @returns {grupos}
+ */
 export async function getPractice3InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
@@ -802,6 +847,53 @@ export async function getPractice3InfoTeacher(req, res) {
     // );
 
     res.json({ grupos });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+/**
+ * Función que trae todas las prácticas del estudiante
+ * @param {*} req
+ * @param {*} res
+ * @returns {practices}
+ */
+export async function getAllPraticesByStudent(req, res) {
+  try {
+    const { idEstudiante } = req.params;
+
+    const getPractices = await sequelize.query(
+      `select pa.*, ge.finalizado as finalizado from practica pa, grupo g, grupo_estudiante ge, estudiante e where e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    if (!getPractices.length)
+      return res.status(404).json({ msg: "Este estudiante no existe" });
+
+    let productStudent = "";
+    let practices = [];
+
+    for (let i = 0; i < getPractices.length; i++) {
+      let idPractica = getPractices[i].idPractica;
+      let productIndex = getPractices[i].idCorteP;
+      productStudent = await sequelize.query(
+        `select p.nombrePC${productIndex} as nombre from producto_corte_${productIndex} p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC${productIndex}=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC${productIndex} limit 1;`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+
+      let practiceInfo = {
+        id: idPractica,
+        nombreProducto: productStudent[0].nombre,
+        nombrePractica: getPractices[i].nombrePractica,
+        descripcion: getPractices[i].descripcionPractica,
+        fecha: formatDate(getPractices[i].fechaHoraPublicacionPractica),
+        estado: getPractices[i].finalizado === 0 ? "Sin realizar" : "Realizada",
+        idCorte: productIndex,
+      };
+      practices.push(practiceInfo);
+    }
+
+    res.json({ practices });
   } catch (error) {
     console.log(error);
   }

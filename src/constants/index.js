@@ -18,8 +18,8 @@ export const CANTIDAD_GAS = 15;
 export const RIQUEZA_GRASA = 39;
 
 export const VARIABLE_SECUNDARIA = {
-  [REFRESCOS]: { name: "cantidad gas", value: CANTIDAD_GAS },
-  [BARRA_JABON]: { name: "riqueza en grasa", value: RIQUEZA_GRASA },
+  [REFRESCOS]: { name: "cant. gas", value: `${CANTIDAD_GAS}%` },
+  [BARRA_JABON]: { name: "riqueza en grasa", value: `${RIQUEZA_GRASA}%` },
 };
 
 export const PRODUCT_UNITS = {
@@ -29,6 +29,9 @@ export const PRODUCT_UNITS = {
   [BARRA_JABON]: "grs",
   [PITILLOS]: "mm",
 };
+
+export const VARIABLE_PRIMARIA = (product) =>
+  product === [PITILLOS] ? "Longitud" : "Cont";
 
 export const attRefrescos = {
   TextosIlegibles: "Textos ilegibles",

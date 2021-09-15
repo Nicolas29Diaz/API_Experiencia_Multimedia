@@ -10,6 +10,7 @@ import {
   VARIABLE,
   ALEATORIO,
   CONSTANTE,
+  PRODUCT_UNITS,
 } from "../constants/index";
 import { getModels } from "../productModels";
 import { getPosterImages } from "../productModels/getPosterImages";
@@ -218,8 +219,10 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
           return {
             id: idProductoC2,
             nombre: nombrePC2,
-            variablePrincipal: variablePrincipalC2,
-            variableSecundaria: variableSecundariaC2,
+            variablePrincipal: `${variablePrincipalC2} ${PRODUCT_UNITS[nombrePC2]}`,
+            ...(variableSecundariaC2 !== null && {
+              variableSecundaria: variableSecundariaC2,
+            }),
             src: getModels(nombrePC2, separateAttributes),
             atributos,
             isChecked: false,
@@ -245,9 +248,9 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
         AtributoNVariable.push(newSubgroup);
       }
       productsSubgroup = {
-        ...(AtributoNAleatorio.length > 0 && { AtributoNAleatorio }),
-        ...(AtributoNConstante.length > 0 && { AtributoNConstante }),
-        ...(AtributoNVariable.length > 0 && { AtributoNVariable }),
+        AtributoNAleatorio,
+        AtributoNConstante,
+        AtributoNVariable,
         poster: getImage,
       };
     }
@@ -263,6 +266,49 @@ export async function getAllProductsC2(req, res) {
   try {
     const productosCorte2 = await ProductoCorte2.findAll();
     res.json(productosCorte2);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getFeaturesC2(req, res) {
+  try {
+    const { idEstudiante, idPractica } = req.params;
+
+    const getInfo = await sequelize.query(
+      `select p.nombrePC2, group_concat(a.nombreAtributo separator ', ') as atributos from atributo a, producto_atributo_2 pa2,producto_corte_2 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa2.idAtributoPA2 and pa2.idProductoC2A=p.idProductoC2 and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC2 limit 1;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const featuresArray = getInfo.map((feature) => {
+      return {
+        feature: [{ name: "atributos", value: feature.atributos }],
+      };
+    });
+
+    const features = featuresArray
+      .map((value) =>
+        value.feature.filter((value) => Object.keys(value).length !== 0)
+      )
+      .flat();
+
+    res.json({ features });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getGraphicsByPractice(req, res) {
+  try {
+    const { idPractica } = req.params;
+    const arrayGraphics = await sequelize.query(
+      `select group_concat(g.nombreGrafico separator ", ") as graficos from grafico g, grafico_practica gp, practica pa where g.idGrafico=gp.idGraficoGP and gp.idPracticaGP=pa.idPractica and pa.idPractica=${idPractica};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const graficos = arrayGraphics.map(({ graficos }) => graficos);
+
+    res.json({ graficos });
   } catch (error) {
     console.log(error);
   }

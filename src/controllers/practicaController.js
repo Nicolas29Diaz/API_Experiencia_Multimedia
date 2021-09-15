@@ -509,7 +509,7 @@ export async function getPractice1InfoTeacher(req, res) {
     const { idPractica } = req.params;
 
     const bannerInfo = await sequelize.query(
-      `   select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
+      `   select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
@@ -526,6 +526,7 @@ export async function getPractice1InfoTeacher(req, res) {
       { type: sequelize.QueryTypes.SELECT }
     );
 
+    let getGroupStatus = [];
     let grupos = [];
     let arrozArray = [];
     let refrescosArray = [];
@@ -544,6 +545,15 @@ export async function getPractice1InfoTeacher(req, res) {
         estudiantes,
       } = groupsInfo[i];
 
+      getGroupStatus = await sequelize.query(
+        `select ge.finalizado from grupo_estudiante ge, grupo g, practica pa where pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and g.idGrupo=${idGrupo} and pa.idPractica=${idPractica};`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+
+      let isGroupsFinish = getGroupStatus.every(
+        ({ finalizado }) => finalizado === 1
+      );
+
       let grupo = {
         idGrupo,
         nombreProducto: nombrePC1,
@@ -554,6 +564,7 @@ export async function getPractice1InfoTeacher(req, res) {
           atributos,
         },
         estudiantes,
+        estado: isGroupsFinish ? "Realizado" : "Sin realizar",
       };
 
       if (nombrePC1 === BOLSA_ARROZ) {
@@ -575,7 +586,10 @@ export async function getPractice1InfoTeacher(req, res) {
 
     // Añade el producto al arreglo de grupos
     const populateArrayGroups = (actualProduct, newArray) =>
-      grupos.push({ nombreProducto: actualProduct, productos: newArray });
+      grupos.push({
+        nombreProducto: actualProduct,
+        productos: newArray,
+      });
 
     if (Array.isArray(arrozArray) && arrozArray.length) {
       const { actualProduct, newArray } =
@@ -603,8 +617,6 @@ export async function getPractice1InfoTeacher(req, res) {
       populateArrayGroups(actualProduct, newArray);
     }
 
-    // TODO: conocer si un grupo ha terminado la practica
-
     res.json({ bannerInfo, grupos });
   } catch (error) {
     console.log(error);
@@ -621,7 +633,7 @@ export async function getPractice2InfoTeacher(req, res) {
     const { idPractica } = req.params;
 
     const bannerInfo = await sequelize.query(
-      `select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ',') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=2 group by pa.idPractica;`,
+      `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ', ') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=${idPractica} group by pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
@@ -639,6 +651,7 @@ export async function getPractice2InfoTeacher(req, res) {
       { type: sequelize.QueryTypes.SELECT }
     );
 
+    let getGroupStatus = [];
     let grupos = [];
     let arrozArray = [];
     let refrescosArray = [];
@@ -658,6 +671,15 @@ export async function getPractice2InfoTeacher(req, res) {
         estudiantes,
       } = groupsInfo[i];
 
+      getGroupStatus = await sequelize.query(
+        `select ge.finalizado from grupo_estudiante ge, grupo g, practica pa where pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and g.idGrupo=${idGrupo} and pa.idPractica=${idPractica};`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+
+      let isGroupsFinish = getGroupStatus.every(
+        ({ finalizado }) => finalizado === 1
+      );
+
       let grupo = {
         idGrupo,
         nombreProducto: nombrePC2,
@@ -671,6 +693,7 @@ export async function getPractice2InfoTeacher(req, res) {
           atributos,
         },
         estudiantes,
+        estado: isGroupsFinish ? "Realizado" : "Sin realizar",
       };
 
       if (nombrePC2 === BOLSA_ARROZ) {
@@ -720,7 +743,7 @@ export async function getPractice2InfoTeacher(req, res) {
       populateArrayGroups(actualProduct, newArray);
     }
 
-    res.json({ grupos });
+    res.json({ bannerInfo, grupos });
   } catch (error) {
     console.log(error);
   }
@@ -737,7 +760,7 @@ export async function getPractice3InfoTeacher(req, res) {
     const { idPractica } = req.params;
 
     const bannerInfo = await sequelize.query(
-      `   select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
+      `   select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
     const groupsInfo = await sequelize.query(
@@ -752,6 +775,7 @@ export async function getPractice3InfoTeacher(req, res) {
       { type: sequelize.QueryTypes.SELECT }
     );
 
+    let getGroupStatus = [];
     let grupos = [];
     let arrozArray = [];
     let refrescosArray = [];
@@ -774,6 +798,15 @@ export async function getPractice3InfoTeacher(req, res) {
         estudiantes,
       } = groupsInfo[i];
 
+      getGroupStatus = await sequelize.query(
+        `select ge.finalizado from grupo_estudiante ge, grupo g, practica pa where pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and g.idGrupo=${idGrupo} and pa.idPractica=${idPractica};`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+
+      let isGroupsFinish = getGroupStatus.every(
+        ({ finalizado }) => finalizado === 1
+      );
+
       let grupo = {
         idGrupo,
         nombreProducto: nombrePC3,
@@ -792,6 +825,7 @@ export async function getPractice3InfoTeacher(req, res) {
           ...(atributos !== "ninguno" && { atributos }),
         },
         estudiantes,
+        estado: isGroupsFinish ? "Realizado" : "Sin realizar",
       };
 
       if (nombrePC3 === BOLSA_ARROZ) {
@@ -841,12 +875,7 @@ export async function getPractice3InfoTeacher(req, res) {
       populateArrayGroups(actualProduct, newArray);
     }
 
-    // const BannerInfo = await sequelize.query(
-    //   `select cu.nombreCurso, co.nombreCorte, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
-    //   { type: sequelize.QueryTypes.SELECT }
-    // );
-
-    res.json({ grupos });
+    res.json({ bannerInfo, grupos });
   } catch (error) {
     console.log(error);
   }
@@ -895,6 +924,21 @@ export async function getAllPraticesByStudent(req, res) {
 
     res.json({ practices });
   } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function deletePractice(req, res) {
+  try {
+    const { idPractica } = req.params;
+
+    await Practica.destroy({
+      where: { idPractica },
+    });
+
+    res.json({ msg: "Práctica eliminada con éxito" });
+  } catch (error) {
+    res.status(500).json({ msg: "Hubo un error" });
     console.log(error);
   }
 }

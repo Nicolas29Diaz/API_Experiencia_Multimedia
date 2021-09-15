@@ -7,6 +7,8 @@ import {
   getPracticePerCourse,
   getStudentCourse,
   getCourseStudent,
+  updateCourse,
+  deleteCourse,
 } from "../controllers/cursoController";
 import { verifyUser } from "../middleware/auth";
 
@@ -30,4 +32,8 @@ router.get("/estudiante/:idEstudiante", getStudentCourse);
 // Conocer que estudiantes pertencen a un curso
 router.get("/curso/:idCurso", getCourseStudent);
 
+// Eliminar curso
+router.delete("/curso/:idCurso", verifyUser, deleteCourse);
+// actualizar curso
+router.put("/curso/:idCurso", verifyUser, updateCourse);
 export default router;

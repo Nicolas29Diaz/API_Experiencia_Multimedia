@@ -97,3 +97,46 @@ export async function getCourseStudent(req, res) {
     console.log(e);
   }
 }
+
+export async function updateCourse(req, res) {
+  try {
+    const { idCurso } = req.params;
+    const { nombreCurso, periodoAcademico } = req.body;
+
+    await Curso.update(
+      {
+        nombreCurso: nombreCurso,
+        periodoAcademico: periodoAcademico,
+      },
+      {
+        where: { idCurso, idProfesorC: req.user.id },
+      }
+    );
+
+    const curso = {
+      idCurso: Number(idCurso),
+      nombreCurso,
+      periodoAcademico,
+    };
+
+    res.json({ curso });
+  } catch (error) {
+    res.status(500).json({ msg: "Hubo un error" });
+    console.log(error);
+  }
+}
+
+export async function deleteCourse(req, res) {
+  try {
+    const { idCurso } = req.params;
+
+    await Curso.destroy({
+      where: { idCurso },
+    });
+
+    res.json({ msg: "Curso eliminado con éxito" });
+  } catch (error) {
+    res.status(500).json({ msg: "Hubo un error" });
+    console.log(error);
+  }
+}

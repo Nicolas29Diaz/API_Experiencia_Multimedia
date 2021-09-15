@@ -183,10 +183,6 @@ export async function getFeatures(req, res) {
         PRODUCT_UNITS[feature.nombrePC1]
       } +- ${feature.toleranciaPC1}`;
 
-      const separteAtt = feature.atributos.split(",");
-      const attMap = separteAtt.map((att) => att);
-      console.log(attMap);
-
       return {
         feature: [
           { name: "contenido", value: valueWithUnits },
@@ -249,7 +245,7 @@ export async function getPracticeOneProductInfoPerStudent(req, res) {
           nombre: nombrePC1,
           variablePrincipal: `${variablePrincipalC1} ${PRODUCT_UNITS[nombrePC1]}`,
           ...(variableSecundariaC1 !== null && {
-            variableSecundaria: variableSecundariaC1,
+            variableSecundaria: `${variableSecundariaC1} %`,
           }),
           src: getModels(nombrePC1, separateAttributes),
           atributos,

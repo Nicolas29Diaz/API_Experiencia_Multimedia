@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
-import MetodoProducto from "./MetodoProducto";
 
 const ProductoCorte3 = sequelize.define(
   "producto_corte_3",
@@ -24,17 +23,9 @@ const ProductoCorte3 = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    estado: { type: DataTypes.TINYINT },
   },
   { tableName: "producto_corte_3", timestamps: false }
 );
-
-// ProductoCorte3.hasMany(MetodoProducto, {
-//   foreignKey: "idProductoMP",
-//   sourceKey: "idProducto",
-// });
-// MetodoProducto.belongsTo(ProductoCorte3, {
-//   foreignKey: "idProductoMP",
-//   sourceKey: "idProducto",
-// });
 
 export default ProductoCorte3;

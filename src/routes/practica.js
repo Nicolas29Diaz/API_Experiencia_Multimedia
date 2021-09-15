@@ -8,19 +8,23 @@ import {
   getPractice2InfoTeacher,
   getPractice3InfoTeacher,
   getAllPraticesByStudent,
+  deletePractice,
 } from "../controllers/practicaController";
 const router = Router();
 import { verifyUser } from "../middleware/auth";
+
 // Inserciones
 router.post("/corte1", verifyUser, createPractice1);
 router.post("/corte2", verifyUser, createPractice2);
 router.post("/corte3", verifyUser, createPractice3);
 
 // Consultas
-// api/practicas
 
 //practica 1 profesor
 router.get("/practica1/:idPractica", verifyUser, getPractice1InfoTeacher);
+router.get("/practica2/:idPractica", verifyUser, getPractice2InfoTeacher);
+router.get("/practica3/:idPractica", verifyUser, getPractice3InfoTeacher);
+
 //practica 1 estudiante
 router.get(
   "/practica1/estudiante/:idEstudiante",
@@ -28,8 +32,10 @@ router.get(
   getAllPraticesByStudent
 );
 
-router.get("/practica2/:idPractica", verifyUser, getPractice2InfoTeacher);
-router.get("/practica3/:idPractica", verifyUser, getPractice3InfoTeacher);
+//obtener todas las practicas
 router.get("/:idCurso", verifyUser, getAllPractices);
+
+// Eliminar practica
+router.delete("/:idPractica", verifyUser, deletePractice);
 
 export default router;

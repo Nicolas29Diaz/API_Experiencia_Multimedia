@@ -29,16 +29,21 @@ export async function getAllProductsC3(req, res) {
 export async function getPracticeThreeProductPerStudent(req, res) {
   const { idEstudiante, idPractica } = req.params;
   try {
-    // const samplingType = await sequelize.query(
-    //   ` select p.* from producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and p.variablePrincipalC3 is not null and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} limit 1;`,
-    //   { type: sequelize.QueryTypes.SELECT }
-    // );
     const samplingType = await sequelize.query(
       `select p.tipoMuestreo from producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica};`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
     const [selectedTypeOfSampling] = samplingType;
+
+    const count = await sequelize.query(
+      `select count(p.idProductoC3) as countProducts from producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa
+where p. idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo 
+and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and e.idEstudiante=${idEstudiante};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const numberProducts = count[0].countProducts;
 
     let productsStudent = "";
 
@@ -47,14 +52,15 @@ export async function getPracticeThreeProductPerStudent(req, res) {
         `select p.tipoMuestreo, p.idGrupoEstudiantePC3, p.nombrePC3, p.variablePrincipalC3,p.toleranciaPC3,p.tamanioLote,p.aql,p.severidad,p.nivelInspeccion,group_concat(m.nombreMetodo separator ', ') as metodos from metodo m, metodo_producto mp, producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where m.idMetodo=mp.idMetodoMP and mp.idProductoMP=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.nombrePC3 limit 1;`,
         { type: sequelize.QueryTypes.SELECT }
       );
-    } else {
+    }
+    if (selectedTypeOfSampling.tipoMuestreo === "atributo") {
       productsStudent = await sequelize.query(
         `select p.tipoMuestreo, p.idGrupoEstudiantePC3, p.nombrePC3,p.tamanioLote,p.aql,p.severidad,p.nivelInspeccion,group_concat(a.nombreAtributo separator ', ') as atributos from atributo a, producto_atributo_3 pa3, producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.nombrePC3 limit 1;`,
         { type: sequelize.QueryTypes.SELECT }
       );
     }
 
-    res.json({ productsStudent });
+    res.json({ productsStudent, numberProducts });
   } catch (error) {
     console.log(error);
     res.status(500).json("Hubo un error");
@@ -84,7 +90,7 @@ export async function createInspectionProductC3(req, res) {
 
     let isHasProductName = nombrePC3 === REFRESCOS || nombrePC3 === BARRA_JABON;
 
-    if (variablePrincipalC3) {
+    if (tipoMuestreo === "variable") {
       for (let i = 0; i < tamanioMuestra; i++) {
         getRandomTolerancePrincipal = getRandomMinMax(
           -toleranciaPC3,
@@ -120,7 +126,8 @@ export async function createInspectionProductC3(req, res) {
           idProductoC3A: inspectionProduct.dataValues.idProductoC3,
         });
       }
-    } else {
+    }
+    if (tipoMuestreo === "atributo") {
       for (let i = 0; i < tamanioMuestra; i++) {
         getRandomTolerancePrincipal = getRandomMinMax(
           -toleranciaPC3,
@@ -146,13 +153,13 @@ export async function createInspectionProductC3(req, res) {
         );
         for (let j = 0; j < resultRandomAttributesList.length; j++) {
           await ProductoAtributo3.create({
-            idAtributoPA3: ATRIBUTOS_CODE[resultRandomAttributesList[j]],
+            idAtributoPA3: ATRIBUTOS_CODE[resultRandomAttributesList[j].trim()],
             idProductoC3A: inspectionProduct.dataValues.idProductoC3,
           });
         }
       }
     }
-    res.json({ msg: "Creado con éxito" });
+    res.json({ msg: "Productos creado con éxito" });
   } catch (error) {
     res.status(500).json({ msg: "Hubo un error" });
     console.log(error);
@@ -225,7 +232,7 @@ export async function getFeaturesC3(req, res) {
 
     const [selectedTypeOfSampling] = samplingType;
 
-    let getInfo = "";
+    let getInfo = [];
 
     if (selectedTypeOfSampling.tipoMuestreo === "variable") {
       getInfo = await sequelize.query(
@@ -234,7 +241,7 @@ export async function getFeaturesC3(req, res) {
       );
     } else {
       getInfo = await sequelize.query(
-        `select p.nombrePC3,group_concat(a.nombreAtributo separator ',') as atributos from atributo a, producto_atributo_3 pa3, producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC3 limit 1;`,
+        `select p.nombrePC3,group_concat(a.nombreAtributo separator ', ') as atributos from atributo a, producto_atributo_3 pa3, producto_corte_3 p, grupo_estudiante ge, estudiante e, grupo g, practica pa where a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC3 limit 1;`,
         { type: sequelize.QueryTypes.SELECT }
       );
     }
@@ -249,10 +256,11 @@ export async function getFeaturesC3(req, res) {
       return {
         feature: [
           {
-            ...(feature.variablePrincipalC3 !== null && {
-              name: primaryVariable,
-              value: valueWithUnits,
-            }),
+            ...(selectedTypeOfSampling.tipoMuestreo === "variable" &&
+              feature.variablePrincipalC3 !== null && {
+                name: primaryVariable,
+                value: valueWithUnits,
+              }),
           },
           ,
           {

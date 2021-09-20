@@ -1,6 +1,6 @@
 import { sequelize } from "../config/database";
 import ProductoCorte1 from "../Models/ProductoCorte1";
-import { getRandomMinMax, getRandomAttributes } from "../helpers";
+import { getRandomMinMax, getRandomAttributes, shuffle } from "../helpers";
 import {
   REFRESCOS,
   BARRA_JABON,
@@ -253,11 +253,14 @@ export async function getPracticeOneProductInfoPerStudent(req, res) {
       }
     );
 
+    // Devuelve el arreglo en diferente orden
+    const shuffleArray = shuffle(products);
+
     const [actualProduct] = productsStudent;
 
     let getImage = getPosterImages(actualProduct.nombrePC1);
 
-    productsArray.push({ poster: getImage, products });
+    productsArray.push({ poster: getImage, products: shuffleArray });
 
     res.json({ productsArray });
   } catch (error) {

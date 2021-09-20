@@ -148,6 +148,10 @@ export async function createPractice2(req, res) {
 
     const getGraphics = graficos.map((grafico) => grafico.value);
 
+    let countRandom = 1;
+    let countConstant = 1;
+    let countVariable = 1;
+
     const practica = await Practica.create(
       {
         nombrePractica,
@@ -239,7 +243,10 @@ export async function createPractice2(req, res) {
         ) {
           // Si el profesor elige un grafico de tipo aleatorio
 
-          if (selectedGraphic[getGraphics[indexGraphic]] === ALEATORIO) {
+          if (
+            countRandom === 1 &&
+            selectedGraphic[getGraphics[indexGraphic]] === ALEATORIO
+          ) {
             for (let s = 0; s < subgrupo; s++) {
               const createSubgroup = await Subgrupo.create(
                 {
@@ -264,10 +271,14 @@ export async function createPractice2(req, res) {
                 { fields: ["idProductoC2SP", "idSubgrupoSP"] }
               );
             }
+            countRandom--;
           }
           // Si el profesor elige un grafico de tipo constante
 
-          if (selectedGraphic[getGraphics[indexGraphic]] === CONSTANTE) {
+          if (
+            countConstant === 1 &&
+            selectedGraphic[getGraphics[indexGraphic]] === CONSTANTE
+          ) {
             for (let s = 0; s < subgrupo; s++) {
               const createSubgroup = await Subgrupo.create(
                 {
@@ -292,10 +303,15 @@ export async function createPractice2(req, res) {
                 { fields: ["idProductoC2SP", "idSubgrupoSP"] }
               );
             }
+
+            countConstant--;
           }
           // Si el profesor elige un grafico de tipo variable
 
-          if (selectedGraphic[getGraphics[indexGraphic]] === VARIABLE) {
+          if (
+            countVariable === 1 &&
+            selectedGraphic[getGraphics[indexGraphic]] === VARIABLE
+          ) {
             for (let s = 0; s < subgrupo; s++) {
               const createSubgroup = await Subgrupo.create(
                 {
@@ -320,6 +336,7 @@ export async function createPractice2(req, res) {
                 { fields: ["idProductoC2SP", "idSubgrupoSP"] }
               );
             }
+            countVariable--;
           }
         }
       }
@@ -432,6 +449,16 @@ export async function createPractice3(req, res) {
         );
 
         if (tipoMuestreo === VARIABLE) {
+          for (
+            let indexMethod = 0;
+            indexMethod < getMethods.length;
+            indexMethod++
+          ) {
+            await MetodoProducto.create({
+              idMetodoMP: getMethods[indexMethod],
+              idProductoMP: referenceProduct.dataValues.idProductoC3,
+            });
+          }
           await ProductoAtributo3.create(
             {
               idAtributoPA3: ATRIBUTOS_CODE["Ninguno"],
@@ -452,20 +479,24 @@ export async function createPractice3(req, res) {
               { fields: ["idAtributoPA3", "idProductoC3A"] }
             );
           }
+          await MetodoProducto.create({
+            idMetodoMP: 4,
+            idProductoMP: referenceProduct.dataValues.idProductoC3,
+          });
         }
 
-        if (getMethods?.length > 0) {
-          for (
-            let indexMethod = 0;
-            indexMethod < getMethods.length;
-            indexMethod++
-          ) {
-            await MetodoProducto.create({
-              idMetodoMP: getMethods[indexMethod],
-              idProductoMP: referenceProduct.dataValues.idProductoC3,
-            });
-          }
-        }
+        // if (getMethods?.length > 0) {
+        //   for (
+        //     let indexMethod = 0;
+        //     indexMethod < getMethods.length;
+        //     indexMethod++
+        //   ) {
+        //     await MetodoProducto.create({
+        //       idMetodoMP: getMethods[indexMethod],
+        //       idProductoMP: referenceProduct.dataValues.idProductoC3,
+        //     });
+        //   }
+        // }
       }
     }
 
@@ -750,7 +781,7 @@ export async function getPractice2InfoTeacher(req, res) {
 }
 
 /**
- * Función que permite traer la información de una practica del corte 3para el docente
+ * Función que permite traer la información de una practica del corte 3 para el docente
  * @param {*} req
  * @param {*} res
  * @returns {grupos}
@@ -760,18 +791,18 @@ export async function getPractice3InfoTeacher(req, res) {
     const { idPractica } = req.params;
 
     const bannerInfo = await sequelize.query(
-      `   select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
+      `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
     const groupsInfo = await sequelize.query(
       `select g.idGrupo,p.nombrePC3, p.variablePrincipalC3, p.toleranciaPC3, p.tamanioLote, p.aql,p.severidad, p.nivelInspeccion,
-       (case when p.tipoMuestreo='atributo' then group_concat(distinct " ",a.nombreAtributo)  else "ninguno" end) as atributos,
+       (case when p.tipoMuestreo='atributo' then group_concat(distinct a.nombreAtributo separator ',')  else "ninguno" end) as atributos,
        (case when p.tipoMuestreo='variable' then group_concat(distinct m.nombreMetodo separator ',')  else "ninguno" end) as metodos,
        group_concat( distinct concat(" ",e.nombreEstudiante ," ",e.apellidoEstudiante)separator ',') as estudiantes 
        from metodo m, metodo_producto mp, atributo a, producto_atributo_3 pa3, producto_corte_3 p,grupo_estudiante ge,
-       estudiante e,grupo g, practica pa where a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and 
+       estudiante e,grupo g, practica pa where m.idMetodo=mp.idMetodoMP and mp.idProductoMP=p.idProductoC3 and a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and 
        p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and 
-       g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} group by g.idGrupo;`,
+       g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica};`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
@@ -797,6 +828,8 @@ export async function getPractice3InfoTeacher(req, res) {
         metodos,
         estudiantes,
       } = groupsInfo[i];
+
+      console.log(metodos);
 
       getGroupStatus = await sequelize.query(
         `select ge.finalizado from grupo_estudiante ge, grupo g, practica pa where pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and g.idGrupo=${idGrupo} and pa.idPractica=${idPractica};`,

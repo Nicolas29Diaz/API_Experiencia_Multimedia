@@ -4,7 +4,7 @@
   "description": "Api de la experiencia multimedia destinada para el apoyo en la enseñanza de la asignatura Control Estadístico de Calidad",
   "main": "index.js",
   "scripts": {
-    "heroku-prebuild": "babel src --out-dir dist",
+    "build": "babel src --out-dir dist",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.js --exec babel-node"
   },

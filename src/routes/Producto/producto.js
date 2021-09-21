@@ -106,7 +106,7 @@ router.get(
 );
 
 router.put(
-  "/corte3/actualizar/:idPractica/estudiante/:idEstudiante",
+  "/corte3/:idPractica/estudiante/:idEstudiante",
   verifyUser,
   updateProductsState
 );

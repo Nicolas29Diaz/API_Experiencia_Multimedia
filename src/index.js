@@ -1,4 +1,5 @@
 import app from "./app";
+import "@babel/polyfill";
 const PORT = process.env.PORT || 4000;
 
 async function main() {

@@ -130,6 +130,17 @@ export async function deleteCourse(req, res) {
   try {
     const { idCurso } = req.params;
 
+    const practiceModule = await sequelize.query(
+      `select pa.idPractica as idPractica, pa.idCorteP as modulo from practica pa, curso c where pa.idCursoP=c.idCurso and c.idCurso=${idCurso};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    for (let i = 0; i < practiceModule.length; i++) {
+      if (practiceModule[i].modulo === 2) {
+        await sequelize.query(
+          `delete subgrupo from subgrupo, subgrupo_producto, producto_corte_2, grupo_estudiante, grupo, practica where subgrupo.idSubgrupo=subgrupo_producto.idSubgrupoSP and subgrupo_producto.idProductoC2SP=producto_corte_2.idProductoC2 and producto_corte_2.idGrupoEstudiantePC2=grupo_estudiante.idGrupoEstudiante and grupo_estudiante.idGrupoGE=grupo.idGrupo and grupo.idPracticaG=practica.idPractica and practica.idPractica=${practiceModule[i].idPractica}`
+        );
+      }
+    }
     await Curso.destroy({
       where: { idCurso },
     });

@@ -1,5 +1,5 @@
 import { sequelize } from "../config/database";
-import Profesor from "../Models/Profesor";
+import Profesor from "../models/Profesor";
 
 export async function insertTeacher(req, res) {
   const { idProfesor, nombreProfesor, apellidoProfesor } = req.body;

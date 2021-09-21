@@ -9,7 +9,7 @@ import ProductoAtributo3 from "../models/ProductoAtributo3";
 import ProductoCorte1 from "../models/ProductoCorte1";
 import ProductoCorte2 from "../models/ProductoCorte2";
 import ProductoCorte3 from "../models/ProductoCorte3";
-import Subgrupo from "../Models/Subgrupo";
+import Subgrupo from "../models/Subgrupo";
 import SubgrupoProducto from "../models/SubgrupoProducto";
 import MetodoProducto from "../models/MetodoProducto";
 import {

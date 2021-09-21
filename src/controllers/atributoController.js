@@ -1,11 +1,14 @@
-import Atributo from "../Models/Atributo";
+import Atributo from "../models/Atributo";
 
 export async function createAtribute(req, res) {
   const { nombreAtributo } = req.body;
   try {
-    const atributo = await Atributo.create({
-      nombreAtributo
-    },{fields:['nombreAtributo']})
+    const atributo = await Atributo.create(
+      {
+        nombreAtributo,
+      },
+      { fields: ["nombreAtributo"] }
+    );
     console.log(atributo);
     res.json(atributo);
   } catch (error) {

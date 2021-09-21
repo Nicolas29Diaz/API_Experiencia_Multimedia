@@ -1,5 +1,5 @@
 import { sequelize } from "../config/database";
-import ProductoCorte1 from "../Models/ProductoCorte1";
+import ProductoCorte1 from "../models/ProductoCorte1";
 import { getRandomMinMax, getRandomAttributes, shuffle } from "../helpers";
 import {
   REFRESCOS,
@@ -10,7 +10,7 @@ import {
   RIQUEZA_GRASA,
   VARIABLE_SECUNDARIA,
 } from "../constants/index";
-import ProductoAtributo1 from "../Models/ProductoAtributo1";
+import ProductoAtributo1 from "../models/ProductoAtributo1";
 import { getModels } from "../productModels";
 import { getPosterImages } from "../productModels/getPosterImages";
 

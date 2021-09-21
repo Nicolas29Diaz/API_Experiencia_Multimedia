@@ -1,5 +1,5 @@
 import { sequelize } from "../config/database";
-import Curso from "../Models/Curso";
+import Curso from "../models/Curso";
 
 export async function createCourse(req, res) {
   const { nombreCurso, periodoAcademico } = req.body;

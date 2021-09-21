@@ -1,7 +1,7 @@
 import { sequelize } from "../config/database";
-import ProductoAtributo2 from "../Models/ProductoAtributo2";
-import ProductoCorte2 from "../Models/ProductoCorte2";
-import SubgrupoProducto from "../Models/SubgrupoProducto";
+import ProductoAtributo2 from "../models/ProductoAtributo2";
+import ProductoCorte2 from "../models/ProductoCorte2";
+import SubgrupoProducto from "../models/SubgrupoProducto";
 import { getRandomAttributes, getRandomMinMax } from "../helpers";
 import {
   REFRESCOS,

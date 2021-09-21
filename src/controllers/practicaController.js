@@ -796,7 +796,7 @@ export async function getPractice3InfoTeacher(req, res) {
     );
     const groupsInfo = await sequelize.query(
       `select g.idGrupo,p.nombrePC3, p.variablePrincipalC3, p.toleranciaPC3, p.tamanioLote, p.aql,p.severidad, p.nivelInspeccion,
-       (case when p.tipoMuestreo='atributo' then group_concat(distinct a.nombreAtributo separator ',')  else "ninguno" end) as atributos,
+       (case when p.tipoMuestreo='atributo' then group_concat(distinct a.nombreAtributo separator ', ')  else "ninguno" end) as atributos,
        (case when p.tipoMuestreo='variable' then group_concat(distinct m.nombreMetodo separator ',')  else "ninguno" end) as metodos,
        group_concat( distinct concat(" ",e.nombreEstudiante ," ",e.apellidoEstudiante)separator ',') as estudiantes 
        from metodo m, metodo_producto mp, atributo a, producto_atributo_3 pa3, producto_corte_3 p,grupo_estudiante ge,
@@ -965,6 +965,16 @@ export async function deletePractice(req, res) {
   try {
     const { idPractica } = req.params;
 
+    const practiceModule = await sequelize.query(
+      `select idCorteP as modulo from practica where idPractica=${idPractica};`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    if (practiceModule[0].modulo === 2) {
+      await sequelize.query(
+        `delete subgrupo from subgrupo, subgrupo_producto, producto_corte_2, grupo_estudiante, grupo, practica where subgrupo.idSubgrupo=subgrupo_producto.idSubgrupoSP and subgrupo_producto.idProductoC2SP=producto_corte_2.idProductoC2 and producto_corte_2.idGrupoEstudiantePC2=grupo_estudiante.idGrupoEstudiante and grupo_estudiante.idGrupoGE=grupo.idGrupo and grupo.idPracticaG=practica.idPractica and practica.idPractica=${idPractica}`
+      );
+    }
     await Practica.destroy({
       where: { idPractica },
     });

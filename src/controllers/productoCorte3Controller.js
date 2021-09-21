@@ -2,7 +2,7 @@ import { sequelize } from "../config/database";
 import ProductoAtributo3 from "../models/ProductoAtributo3";
 import Practica from "../models/Practica";
 import ProductoCorte3 from "../models/ProductoCorte3";
-import { getRandomAttributes, getRandomMinMax } from "../helpers";
+import { getRandomAttributes, getRandomMinMax, shuffle } from "../helpers";
 import {
   ATRIBUTOS_CODE,
   BARRA_JABON,
@@ -128,7 +128,39 @@ export async function createInspectionProductC3(req, res) {
       }
     }
     if (tipoMuestreo === "atributo") {
-      for (let i = 0; i < tamanioMuestra; i++) {
+      // Número de productos en buen estado
+      let normalProductAmount = Math.round(tamanioMuestra * 0.6);
+      // Número de productos en mal estado
+      let faultyProductAmount = tamanioMuestra - normalProductAmount;
+      for (let i = 0; i < normalProductAmount; i++) {
+        getRandomTolerancePrincipal = getRandomMinMax(
+          -toleranciaPC3,
+          toleranciaPC3
+        );
+
+        randomItem = getRandomMinMax(1, atributosProduct.length);
+
+        resultRandomAttributesList = getRandomAttributes(
+          randomItem,
+          atributosProduct
+        );
+
+        inspectionProduct = await ProductoCorte3.create(
+          {
+            nombrePC3,
+            idGrupoEstudiantePC3,
+            tipoMuestreo,
+          },
+          {
+            fields: ["nombrePC3", "idGrupoEstudiantePC3", "tipoMuestreo"],
+          }
+        );
+        await ProductoAtributo3.create({
+          idAtributoPA3: ATRIBUTOS_CODE["Ninguno"],
+          idProductoC3A: inspectionProduct.dataValues.idProductoC3,
+        });
+      }
+      for (let i = 0; i < faultyProductAmount; i++) {
         getRandomTolerancePrincipal = getRandomMinMax(
           -toleranciaPC3,
           toleranciaPC3
@@ -209,11 +241,14 @@ export async function getPracticeThreeProductInfoPerStudent(req, res) {
         };
       }
     );
+
+    let shuffleArray = shuffle(products);
+
     let [actualProduct] = products;
     let image = actualProduct.nombre;
     let getImage = getPosterImages(image);
 
-    productsArray.push({ poster: getImage, products });
+    productsArray.push({ poster: getImage, products: shuffleArray });
 
     res.json({ productsArray });
   } catch (error) {
@@ -264,7 +299,8 @@ export async function getFeaturesC3(req, res) {
           },
           ,
           {
-            ...(feature.variableSecundariaC1 !== null &&
+            ...(selectedTypeOfSampling.tipoMuestreo === "variable" &&
+              feature.variableSecundariaC1 !== null &&
               VARIABLE_SECUNDARIA[feature.nombrePC3]),
           },
           {
@@ -333,9 +369,9 @@ export async function updateProductsState(req, res) {
       );
     }
 
-    res.json({ msg: "Modificado con éxito" });
+    res.json({ msg: "Datos guardados con éxito" });
   } catch (error) {
-    res.status(500).json({ msg: "Hubo un error" });
+    res.status(500).json({ msg: "Hubo un error al guardar los datos" });
     console.log(error);
   }
 }

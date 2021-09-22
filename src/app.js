@@ -20,7 +20,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(json());
 
-router.use(function (req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "https://trabajo-grado.vercel.app");
   res.header(
     "Access-Control-Allow-Headers",
@@ -29,7 +29,6 @@ router.use(function (req, res, next) {
   next();
 });
 // routes
-app.options("*", cors());
 app.use("/api/usuario", usuarioRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/profesor", profesorRoutes);

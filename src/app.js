@@ -16,7 +16,7 @@ import authRoutes from "./routes/auth";
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors("*"));
 app.use(morgan("dev"));
 app.use(json());
 

@@ -209,6 +209,7 @@ export async function getFeatures(req, res) {
 
 // Se obtienen los productos para la inspección
 export async function getPracticeOneProductInfoPerStudent(req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
   try {
     const { idEstudiante, idPractica } = req.params;
 

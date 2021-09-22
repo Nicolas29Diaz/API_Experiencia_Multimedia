@@ -16,11 +16,12 @@ import authRoutes from "./routes/auth";
 const app = express();
 
 // Middlewares
-app.use(cors("*"));
+app.use(cors());
 app.use(morgan("dev"));
 app.use(json());
 
 // routes
+app.options("*", cors());
 app.use("/api/usuario", usuarioRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/profesor", profesorRoutes);

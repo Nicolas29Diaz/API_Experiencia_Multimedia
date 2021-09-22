@@ -16,18 +16,15 @@ import authRoutes from "./routes/auth";
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://trabajo-grado.vercel.app",
+    credentials: true,
+  })
+);
 app.use(morgan("dev"));
 app.use(json());
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://trabajo-grado.vercel.app");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
 // routes
 app.use("/api/usuario", usuarioRoutes);
 app.use("/api/auth", authRoutes);

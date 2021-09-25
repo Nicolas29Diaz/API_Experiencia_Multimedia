@@ -17,7 +17,7 @@ export async function authenticateUser(req, res) {
       });
 
       if (!estudiante) {
-        return res.status(400).json({ msg: "El usuario no existe" });
+        return res.status(400).json({ msg: "Usuario o contraseña incorrecta" });
       }
 
       // Revisar password
@@ -58,7 +58,7 @@ export async function authenticateUser(req, res) {
       });
 
       if (!profesor) {
-        return res.status(400).json({ msg: "El usuario no existe" });
+        return res.status(400).json({ msg: "Usuario o contraseña incorrecta" });
       }
 
       // Revisar password

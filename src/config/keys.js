@@ -1,6 +1,9 @@
 import { config } from "dotenv";
 
-config();
+if (process.env.NODE_ENV !== "production") {
+  config();
+}
+
 export const database = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,

@@ -221,7 +221,7 @@ export async function getProductInfoPerSubgroupAndStudent(req, res) {
             nombre: nombrePC2,
             variablePrincipal: `${variablePrincipalC2} ${PRODUCT_UNITS[nombrePC2]}`,
             ...(variableSecundariaC2 !== null && {
-              variableSecundaria: variableSecundariaC2,
+              variableSecundaria: `${variableSecundariaC2} %`,
             }),
             src: getModels(nombrePC2, separateAttributes),
             atributos,

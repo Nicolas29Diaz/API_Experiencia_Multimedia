@@ -89,13 +89,58 @@ export async function createInspectionProductC3(req, res) {
     let atributosProduct = atributos?.split(",");
 
     let isHasProductName = nombrePC3 === REFRESCOS || nombrePC3 === BARRA_JABON;
+    // Número de productos en buen estado
+    let normalProductAmount = Math.round(tamanioMuestra * 0.6);
+    // Número de productos en mal estado
+    let faultyProductAmount = tamanioMuestra - normalProductAmount;
 
     if (tipoMuestreo === "variable") {
-      for (let i = 0; i < tamanioMuestra; i++) {
+      for (let i = 0; i < normalProductAmount; i++) {
         getRandomTolerancePrincipal = getRandomMinMax(
           -toleranciaPC3,
           toleranciaPC3
         );
+
+        getRandomToleranceSecondary =
+          isHasProductName && getRandomMinMax(-2, 2);
+
+        inspectionProduct = await ProductoCorte3.create(
+          {
+            nombrePC3,
+            variablePrincipalC3:
+              variablePrincipalC3 + getRandomTolerancePrincipal,
+            ...(isHasProductName === BARRA_JABON && {
+              variableSecundariaC3: 39 + getRandomToleranceSecondary,
+            }),
+            ...(isHasProductName && {
+              variableSecundariaC3: 15 + getRandomToleranceSecondary,
+            }),
+            idGrupoEstudiantePC3,
+            tipoMuestreo,
+          },
+          {
+            fields: [
+              "nombrePC3",
+              "variablePrincipalC3",
+              "variableSecundariaC3",
+              "idGrupoEstudiantePC3",
+              "tipoMuestreo",
+            ],
+          }
+        );
+        await ProductoAtributo3.create({
+          idAtributoPA3: ATRIBUTOS_CODE["Ninguno"],
+          idProductoC3A: inspectionProduct.dataValues.idProductoC3,
+        });
+      }
+
+      for (let i = 0; i < faultyProductAmount; i++) {
+        getRandomTolerancePrincipal = getRandomMinMax(
+          -toleranciaPC3 + 5,
+          toleranciaPC3 + 5
+        );
+        getRandomToleranceSecondary =
+          isHasProductName && getRandomMinMax(-5, 5);
 
         inspectionProduct = await ProductoCorte3.create(
           {
@@ -128,10 +173,6 @@ export async function createInspectionProductC3(req, res) {
       }
     }
     if (tipoMuestreo === "atributo") {
-      // Número de productos en buen estado
-      let normalProductAmount = Math.round(tamanioMuestra * 0.6);
-      // Número de productos en mal estado
-      let faultyProductAmount = tamanioMuestra - normalProductAmount;
       for (let i = 0; i < normalProductAmount; i++) {
         getRandomTolerancePrincipal = getRandomMinMax(
           -toleranciaPC3,

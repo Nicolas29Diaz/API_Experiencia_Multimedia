@@ -11,7 +11,7 @@ const Curso = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    nombreCurso: { type: DataTypes.STRING(25), allowNull: false },
+    nombreCurso: { type: DataTypes.STRING(40), allowNull: false },
     periodoAcademico: { type: DataTypes.STRING(25), allowNull: false },
     idProfesorC: {
       type: DataTypes.INTEGER,

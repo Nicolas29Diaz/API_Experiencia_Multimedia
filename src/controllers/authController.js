@@ -12,12 +12,15 @@ export async function authenticateUser(req, res) {
     // Rol seleccionado es estudiante
 
     if (role.value === "estudiante") {
+
+      console.log("SOY ESTUDIANTE");
+
       const estudiante = await Estudiante.findOne({
         where: { emailEstudiante: email },
       });
 
-      if (!estudiante) {
-        return res.status(400).json({ msg: "Usuario o contraseña incorrecta" });
+      if (!estudiante) {  
+        return res.status(400).json({ msg: "Usuario o contraseña incorrecta" }); 
       }
 
       // Revisar password
@@ -26,7 +29,10 @@ export async function authenticateUser(req, res) {
         estudiante.contrasenaEstudiante
       );
 
-      if (correctPassword) {
+        console.log(correctPassword)
+        
+      if (!correctPassword) { //SE MODIFICÓ LA CONDICION
+
         return res.status(400).json({ msg: "Usuario o contraseña incorrecta" });
       }
 

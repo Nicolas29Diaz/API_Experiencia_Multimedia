@@ -24,6 +24,8 @@ export async function hashedPassword(password) {
 }
 
 export async function comparePassword(passwordRecieved, passwordDB) {
+  console.log("Recibida: " + passwordRecieved)
+  console.log("BD: " + passwordDB)
   return await bcrypsjs.compareSync(passwordRecieved, passwordDB);
 }
 

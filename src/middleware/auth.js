@@ -11,8 +11,16 @@ export function verifyUser(req, res, next) {
 
   try {
     const encoded = jwt.verify(token, process.env.SECRET_WORD);
+
+    console.log(req)/////
+
+
     req.user = encoded.user;
+
+    console.log(req.user)/////
+    
     next();
+    
   } catch (error) {
     res.status(401).json({ msg: "Token no válido" });
   }

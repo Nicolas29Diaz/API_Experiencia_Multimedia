@@ -11,10 +11,9 @@ import productoRoutes from "./routes/Producto/producto";
 import atributoRoutes from "./routes/Atributo/Atributo";
 import usuarioRoutes from "./routes/usuario";
 import authRoutes from "./routes/auth";
-
+import recursoRoutes from "./routes/recurso";
 // Initializations
 const app = express();
-
 
 app.use(cors());
 app.use(morgan("dev"));
@@ -30,5 +29,6 @@ app.use("/api/grupo", grupoRoutes);
 app.use("/api/estudiante", estudianteRoutes);
 app.use("/api/producto", productoRoutes);
 app.use("/api/atributos", atributoRoutes);
+app.use("/api/recursos",recursoRoutes);
 
 export default app;

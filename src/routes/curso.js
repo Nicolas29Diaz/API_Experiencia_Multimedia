@@ -10,14 +10,14 @@ import {
   updateCourse,
   deleteCourse,
 } from "../controllers/cursoController";
-import { verifyUser } from "../middleware/auth";
+import { verifyUser, permitirSoloProfesor } from "../middleware/auth";
 
 const router = Router();
 
 // /api/cursos
 
 // Inserciones
-router.post("/", verifyUser, createCourse);
+router.post("/", verifyUser, permitirSoloProfesor, createCourse);
 
 // Consultas
 router.get("/", verifyUser, getAllCourses);
@@ -33,7 +33,12 @@ router.get("/estudiante/:idEstudiante", getStudentCourse);
 router.get("/curso/:idCurso", getCourseStudent);
 
 // Eliminar curso
-router.delete("/curso/:idCurso", verifyUser, deleteCourse);
+router.delete(
+  "/curso/:idCurso",
+  verifyUser,
+  permitirSoloProfesor,
+  deleteCourse
+);
 // actualizar curso
-router.put("/curso/:idCurso", verifyUser, updateCourse);
+router.put("/curso/:idCurso", verifyUser, permitirSoloProfesor, updateCourse);
 export default router;

@@ -113,3 +113,26 @@ export async function getStudentPracticeState(req, res) {
     console.log(error);
   }
 }
+
+export async function getAllStudentsAllData(req, res) {
+  try {
+    const estudiantes = await Estudiante.findAll({
+      attributes: [
+        "idEstudiante",
+        [
+          sequelize.fn(
+            "CONCAT",
+            sequelize.col("nombreEstudiante"),
+            " ",
+            sequelize.col("apellidoEstudiante")
+          ),
+          "estudiante",
+        ],
+        "emailEstudiante",
+      ],
+    });
+    res.json({ estudiantes });
+  } catch (error) {
+    console.log(error);
+  }
+}

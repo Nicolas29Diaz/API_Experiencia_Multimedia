@@ -4,6 +4,7 @@ import {
   updateVideo,
   postDocument,
   deleteDocument,
+  getDocumentsPractice,
 } from "../controllers/recursoController";
 import { Router } from "express";
 import { verifyUser, permitirSoloProfesor } from "../middleware/auth";
@@ -12,6 +13,7 @@ const router = Router();
 // Obtiene los documentos y videos
 router.get("/documents", getDocuments);
 router.get("/videos", getVideos);
+router.get("/documents/:idPractica", getDocumentsPractice);
 
 //Actualiza la url de un video
 router.put(

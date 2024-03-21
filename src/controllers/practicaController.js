@@ -12,6 +12,7 @@ import ProductoCorte3 from "../models/ProductoCorte3";
 import Subgrupo from "../models/Subgrupo";
 import SubgrupoProducto from "../models/SubgrupoProducto";
 import MetodoProducto from "../models/MetodoProducto";
+import PracticaRecurso from "../models/Practica_Recurso";
 import {
   ALEATORIO,
   CONSTANTE,
@@ -34,6 +35,33 @@ import {
 } from "../helpers";
 
 /**
+ * Función que permite crear una practica_recursp para almacenar los recursos de una practica
+ * @param {} req
+ * @param {} res
+ * @returns {idPractica_Recurso}
+ */
+export async function createPracticeResource(idPractica, idRecursos) {
+  try {
+    // Crear una entrada en la tabla practica_recurso para cada idRecurso
+    const promises = idRecursos.map(async ({ idRecurso }) => {
+      await PracticaRecurso.create({
+        idPracticaPr: idPractica,
+        idRecursoPr: idRecurso,
+      });
+    });
+
+    // Esperar a que se completen todas las operaciones de creación
+    await Promise.all(promises);
+    // La creación se completó exitosamente
+    console.log(promises);
+  } catch (error) {
+    // Manejar errores
+    console.error("Ocurrió un error al crear las relaciones:", error);
+    throw error; // Re-lanza el error para que sea manejado en un nivel superior si es necesario
+  }
+}
+
+/**
  * Función que permite crear una práctica del corte 1
  * @param {} req
  * @param {} res
@@ -45,6 +73,7 @@ export async function createPractice1(req, res) {
       field: { nombrePractica, descripcion, modulo },
       groups,
       parseIntIdCurso,
+      idRecursos,
     } = req.body;
 
     const idCorteP = modulo.value;
@@ -119,8 +148,11 @@ export async function createPractice1(req, res) {
         }
       }
     }
+    const idPractica = practica.dataValues.idPractica;
 
-    res.status(200).json({ idPractica: practica.dataValues.idPractica });
+    res.status(200).json({ idPractica });
+
+    createPracticeResource(idPractica, idRecursos);
   } catch (error) {
     res.status(500).json("Hubo un error");
     console.log(error);
@@ -144,6 +176,7 @@ export async function createPractice2(req, res) {
       },
       groups,
       parseIntIdCurso,
+      idRecursos,
     } = req.body;
 
     const getGraphics = graficos.map((grafico) => grafico.value);
@@ -342,7 +375,9 @@ export async function createPractice2(req, res) {
       }
     }
 
-    res.json({ idPractica: practica.dataValues.idPractica });
+    const idPractica = practica.dataValues.idPractica;
+    createPracticeResource(idPractica, idRecursos);
+    res.json({ idPractica });
   } catch (error) {
     console.log(error);
   }
@@ -365,6 +400,7 @@ export async function createPractice3(req, res) {
       },
       groups,
       parseIntIdCurso,
+      idRecursos,
     } = req.body;
 
     const practica = await Practica.create(
@@ -500,6 +536,8 @@ export async function createPractice3(req, res) {
       }
     }
 
+    const idPractica = practica.dataValues.idPractica;
+    createPracticeResource(idPractica, idRecursos);
     res.json({ idPractica: practica.dataValues.idPractica });
   } catch (error) {
     console.log(error);
@@ -546,13 +584,15 @@ export async function getPractice1InfoTeacher(req, res) {
 
     const groupsInfo = await sequelize.query(
       `select g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1,
-              p.toleranciaPC1,group_concat(distinct " ",a.nombreAtributo) as atributos,
-              group_concat( distinct concat(" ",e.nombreEstudiante, " ",e.apellidoEstudiante)separator ',')  as estudiantes
-        from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante ge, estudiante e, 
-		          grupo g, practica pa 
-        where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and 
-              p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and 
-              ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} group by g.idGrupo;
+      p.toleranciaPC1, group_concat(distinct " ",a.nombreAtributo) as atributos,
+      group_concat( distinct concat(" ",e.nombreEstudiante, " ",e.apellidoEstudiante)separator ',')  as estudiantes
+from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante ge, estudiante e, 
+      grupo g, practica pa 
+where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and 
+      p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and 
+      ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} 
+group by g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1, p.toleranciaPC1;
+
       `,
       { type: sequelize.QueryTypes.SELECT }
     );
@@ -664,21 +704,47 @@ export async function getPractice2InfoTeacher(req, res) {
     const { idPractica } = req.params;
 
     const bannerInfo = await sequelize.query(
-      `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ', ') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=${idPractica} group by pa.idPractica;`,
+      `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ', ') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=${idPractica} group by 
+      pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
     const groupsInfo = await sequelize.query(
-      `select g.idGrupo, count(distinct s.idSubgrupo) as subgrupos,s.cantidadSubgrupo, p.nombrePC2, p.variablePrincipalC2,
-              p.toleranciaPC2,group_concat(distinct " ",a.nombreAtributo) as atributos,
-              group_concat( distinct concat(" ",e.nombreEstudiante, " ",e.apellidoEstudiante)separator ',')  as estudiantes
-      from atributo a, producto_atributo_2 pa2, producto_corte_2 p,subgrupo s, subgrupo_producto sp, 
-            grupo_estudiante ge, estudiante e,grupo g, practica pa 
-      where a.idAtributo=pa2.idAtributoPA2 and 
-            pa2.idProductoC2A=p.idProductoC2 and 
-            sp.idSubgrupoSP= s.idSubgrupo and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante
-            and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and 
-            g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} group by g.idGrupo;`,
+      `SELECT
+      g.idGrupo,
+      COUNT(DISTINCT s.idSubgrupo) AS subgrupos,
+      s.cantidadSubgrupo,
+      p.nombrePC2,
+      p.variablePrincipalC2,
+      p.toleranciaPC2,
+      GROUP_CONCAT(DISTINCT " ", a.nombreAtributo) AS atributos,
+      GROUP_CONCAT(DISTINCT CONCAT(" ", e.nombreEstudiante, " ", e.apellidoEstudiante) SEPARATOR ',') AS estudiantes
+  FROM
+      atributo a,
+      producto_atributo_2 pa2,
+      producto_corte_2 p,
+      subgrupo s,
+      subgrupo_producto sp,
+      grupo_estudiante ge,
+      estudiante e,
+      grupo g,
+      practica pa
+  WHERE
+      a.idAtributo = pa2.idAtributoPA2
+      AND pa2.idProductoC2A = p.idProductoC2
+      AND sp.idSubgrupoSP = s.idSubgrupo
+      AND p.idGrupoEstudiantePC2 = ge.idGrupoEstudiante
+      AND e.idEstudiante = ge.idEstudianteGE
+      AND ge.idGrupoGE = g.idGrupo
+      AND g.idPracticaG = pa.idPractica
+      AND pa.idPractica = ${idPractica}
+  GROUP BY
+      g.idGrupo,
+      s.cantidadSubgrupo,
+      p.nombrePC2,
+      p.variablePrincipalC2,
+      p.toleranciaPC2;  
+`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
@@ -961,9 +1027,36 @@ export async function getAllPraticesByStudent(req, res) {
   }
 }
 
+export async function deletePracticeResource(idPractica) {
+  try {
+    // Eliminar los registros en la tabla practica_recurso que coincidan con idPractica
+    const rowsDeleted = await PracticaRecurso.destroy({
+      where: {
+        idPracticaPr: idPractica,
+      },
+    });
+
+    // Verificar si se eliminaron registros
+    if (rowsDeleted > 0) {
+      console.log(
+        `Se eliminaron ${rowsDeleted} registros de la tabla practica_recurso relacionados con la práctica ${idPractica}.`
+      );
+    } else {
+      console.log(
+        `No se encontraron registros para eliminar en la tabla practica_recurso relacionados con la práctica ${idPractica}.`
+      );
+    }
+  } catch (error) {
+    // Manejar errores
+    console.error("Ocurrió un error al eliminar los registros:", error);
+    throw error; // Re-lanza el error para que sea manejado en un nivel superior si es necesario
+  }
+}
+
 export async function deletePractice(req, res) {
   try {
     const { idPractica } = req.params;
+    deletePracticeResource(idPractica);
 
     const practiceModule = await sequelize.query(
       `select idCorteP as modulo from practica where idPractica=${idPractica};`,

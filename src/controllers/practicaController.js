@@ -42,18 +42,20 @@ import {
  */
 export async function createPracticeResource(idPractica, idRecursos) {
   try {
+    console.log(idRecursos);
     // Crear una entrada en la tabla practica_recurso para cada idRecurso
-    const promises = idRecursos.map(async ({ idRecurso }) => {
-      await PracticaRecurso.create({
-        idPracticaPr: idPractica,
-        idRecursoPr: idRecurso,
+    if (idRecursos?.length > 0) {
+      const promises = idRecursos?.map(async ({ idRecurso }) => {
+        await PracticaRecurso.create({
+          idPracticaPr: idPractica,
+          idRecursoPr: idRecurso,
+        });
       });
-    });
-
-    // Esperar a que se completen todas las operaciones de creación
-    await Promise.all(promises);
-    // La creación se completó exitosamente
-    console.log(promises);
+      // Esperar a que se completen todas las operaciones de creación
+      await Promise.all(promises);
+      // La creación se completó exitosamente
+      console.log(promises);
+    }
   } catch (error) {
     // Manejar errores
     console.error("Ocurrió un error al crear las relaciones:", error);

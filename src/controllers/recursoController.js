@@ -122,6 +122,31 @@ export async function deletePracticeResource(idRecurso) {
   }
 }
 
+export async function deletePracticeResourceByPractice(idPractica) {
+  try {
+    // Eliminar los registros en la tabla practica_recurso que coincidan con idPractica
+    const rowsDeleted = await PracticaRecurso.destroy({
+      where: {
+        idPracticaPr: idPractica,
+      },
+    });
+
+    // Verificar si se eliminaron registros
+    if (rowsDeleted > 0) {
+      console.log(
+        `Se eliminaron ${rowsDeleted} registros de la tabla practica_recurso relacionados con la práctica ${idPractica}.`
+      );
+    } else {
+      console.log(
+        `No se encontraron registros para eliminar en la tabla practica_recurso relacionados con la práctica ${idPractica}.`
+      );
+    }
+  } catch (error) {
+    // Manejar errores
+    console.error("Ocurrió un error al eliminar los registros:", error);
+    throw error; // Re-lanza el error para que sea manejado en un nivel superior si es necesario
+  }
+}
 export async function deleteDocument(req, res) {
   try {
     //PRIMERO BORRAR DE PRACTICA_RECURSO

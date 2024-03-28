@@ -7,6 +7,7 @@ import {
   updatePracticeState,
   getStudentPracticeState,
   getAllStudentsAllData,
+  deleteStudent,
 } from "../controllers/estudianteController";
 import { verifyUser } from "../middleware/auth";
 const router = Router();
@@ -35,5 +36,5 @@ router.get(
   getStudentPracticeState
 );
 
-
+router.delete("/:idEstudiante", deleteStudent);
 export default router;

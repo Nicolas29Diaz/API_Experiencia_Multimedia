@@ -8,6 +8,7 @@ import {
   getStudentPracticeState,
   getAllStudentsAllData,
   deleteStudent,
+  deleteAllStudents,
 } from "../controllers/estudianteController";
 import { verifyUser } from "../middleware/auth";
 const router = Router();
@@ -36,5 +37,10 @@ router.get(
   getStudentPracticeState
 );
 
-router.delete("/:idEstudiante", deleteStudent);
+router.delete("/:idEstudiante", verifyUser, deleteStudent);
+router.delete(
+  "/",
+  verifyUser,
+  deleteAllStudents
+);
 export default router;

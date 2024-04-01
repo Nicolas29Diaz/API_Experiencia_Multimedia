@@ -1,5 +1,6 @@
 import Recurso from "../models/Recurso";
 import PracticaRecurso from "../models/Practica_Recurso";
+import { sequelize } from "../config/database";
 
 export async function getDocuments(req, res) {
   try {
@@ -25,24 +26,17 @@ export async function getVideos(req, res) {
   }
 }
 
-export async function getDocumentsPractice(req, res) {
-  const idPractica = req.params.idPractica;
-
+export async function getDocumentsPractice(idPractica) {
   try {
-    const documentos = await PracticaRecurso.findAll({
-      where: { idPracticaPr: idPractica },
-      include: [
-        {
-          model: Recurso,
-          attributes: ["urlRecurso", "nombreRecurso"],
-        },
-      ],
-    });
+    const documentos = await sequelize.query(
+      `SELECT r.idRecurso, r.urlRecurso, r.nombreRecurso FROM recurso r, practica_recurso pr WHERE pr.idPracticaPr = ${idPractica} and r.idRecurso = pr.idRecursoPr;`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    console.log(documentos);
 
-    res.json(documentos);
+    return documentos;
   } catch (error) {
     console.log(error);
-    res.status(500).json({ msg: "Hubo un error" });
   }
 }
 
@@ -121,7 +115,6 @@ export async function deletePracticeResource(idRecurso) {
     throw error; // Re-lanza el error para que sea manejado en un nivel superior si es necesario
   }
 }
-
 export async function deletePracticeResourceByPractice(idPractica) {
   try {
     // Eliminar los registros en la tabla practica_recurso que coincidan con idPractica

@@ -13,6 +13,8 @@ import Subgrupo from "../models/Subgrupo";
 import SubgrupoProducto from "../models/SubgrupoProducto";
 import MetodoProducto from "../models/MetodoProducto";
 import PracticaRecurso from "../models/Practica_Recurso";
+import { deletePracticeResourceByPractice } from "./recursoController";
+import { getDocumentsPractice } from "./recursoController";
 import {
   ALEATORIO,
   CONSTANTE,
@@ -152,7 +154,7 @@ export async function createPractice1(req, res) {
     }
     const idPractica = practica.dataValues.idPractica;
 
-    res.status(200).json({ idPractica });
+    res.status(200).json({ idPractica: practica.dataValues.idPractica });
 
     createPracticeResource(idPractica, idRecursos);
   } catch (error) {
@@ -556,6 +558,54 @@ export async function createPractice3(req, res) {
 
 export async function getAllPractices(req, res) {
   try {
+    const idGruposQueryResult = await sequelize.query(
+      `SELECT g.idGrupo
+        FROM grupo g
+        LEFT JOIN grupo_estudiante ge ON g.idGrupo = ge.idGrupoGE
+        WHERE ge.idGrupoGE IS NULL;
+      `,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+    const idGrupos = idGruposQueryResult.map((result) => result.idGrupo);
+    // console.log("idGrupos sin estudiantes:");
+    // console.log(idGrupos);
+    if (idGrupos.length > 0) {
+      for (const idGrupo of idGrupos) {
+        await sequelize.query(`DELETE FROM grupo WHERE idGrupo = ${idGrupo};`);
+      }
+    } else {
+      // console.log("No hay grupos sin estudiantes");
+    }
+
+    //Si en grupo no existe el id de la practica pues se borra la practica
+    // Obtener practica sin grupos
+    const idPracticasQueryResult = await sequelize.query(
+      `SELECT p.idPractica
+        FROM practica p
+        LEFT JOIN grupo g ON p.idPractica = g.idPracticaG
+        WHERE g.idPracticaG IS NULL;
+      `,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const idPracticas = idPracticasQueryResult.map(
+      (result) => result.idPractica
+    );
+    // console.log("idPracticas sin grupos:");
+
+    // console.log(idPracticas);
+
+    if (idPracticas.length > 0) {
+      for (const idPractica of idPracticas) {
+        console.log(idPractica);
+        await deletePracticeResourceByPractice(idPractica);
+        await deletePractice2(idPractica);
+      }
+      // console.log("Hay prácticas sin estudiantes");
+    } else {
+      // console.log("No hay prácticas sin estudiantes");
+    }
+
     const { idCurso } = req.params;
     const practices = await sequelize.query(
       `select pa.idPractica, pa.nombrePractica, pa.idCorteP 
@@ -564,6 +614,7 @@ export async function getAllPractices(req, res) {
       and p.idProfesor=${req.user.id} and cu.idCurso=${idCurso};`,
       { type: sequelize.QueryTypes.SELECT }
     );
+
     res.json({ practices });
   } catch (error) {
     console.log(error);
@@ -579,10 +630,13 @@ export async function getPractice1InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
 
+    const recurso = await getDocumentsPractice(idPractica);
     const bannerInfo = await sequelize.query(
       `   select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
+
+    bannerInfo[0].recurso = recurso;
 
     const groupsInfo = await sequelize.query(
       `select g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1,
@@ -690,6 +744,7 @@ group by g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1, p.toleran
       populateArrayGroups(actualProduct, newArray);
     }
 
+    console.log(grupos);
     res.json({ bannerInfo, grupos });
   } catch (error) {
     console.log(error);
@@ -705,12 +760,14 @@ export async function getPractice2InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
 
+    const recurso = await getDocumentsPractice(idPractica);
+
     const bannerInfo = await sequelize.query(
       `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ', ') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=${idPractica} group by 
       pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
-
+    bannerInfo[0].recurso = recurso;
     const groupsInfo = await sequelize.query(
       `SELECT
       g.idGrupo,
@@ -845,9 +902,8 @@ export async function getPractice2InfoTeacher(req, res) {
     if (!grupos.length) {
       // console.log("BORAR PRACTICA SIN GRUPOS");
       // deletePractice(req, res);
-      console.log("LA PRACTICA NO TIENE GRUPOS")
     } else {
-      console.log("NADA");
+      // console.log("NADA");
     }
 
     res.json({ bannerInfo, grupos });
@@ -865,11 +921,13 @@ export async function getPractice2InfoTeacher(req, res) {
 export async function getPractice3InfoTeacher(req, res) {
   try {
     const { idPractica } = req.params;
+    const recurso = await getDocumentsPractice(idPractica);
 
     const bannerInfo = await sequelize.query(
       `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica,group_concat(g.idGrupo separator ',') as grupos from grupo g, curso cu, corte co, practica pa where g.idPracticaG=pa.idPractica and pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=${idPractica} group by pa.idPractica;`,
       { type: sequelize.QueryTypes.SELECT }
     );
+    bannerInfo[0].recurso = recurso;
     const groupsInfo = await sequelize.query(
       `SELECT 
     g.idGrupo,
@@ -1049,6 +1107,9 @@ export async function getAllPraticesByStudent(req, res) {
     for (let i = 0; i < getPractices.length; i++) {
       let idPractica = getPractices[i].idPractica;
       let productIndex = getPractices[i].idCorteP;
+
+      const recurso = await getDocumentsPractice(idPractica);
+
       productStudent = await sequelize.query(
         `select p.nombrePC${productIndex} as nombre from producto_corte_${productIndex} p, grupo_estudiante ge, estudiante e, grupo g, practica pa where p.idGrupoEstudiantePC${productIndex}=ge.idGrupoEstudiante and ge.idEstudianteGE=e.idEstudiante and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and e.idEstudiante=${idEstudiante} and pa.idPractica=${idPractica} group by p.idProductoC${productIndex} limit 1;`,
         { type: sequelize.QueryTypes.SELECT }
@@ -1062,6 +1123,7 @@ export async function getAllPraticesByStudent(req, res) {
         fecha: formatDate(getPractices[i].fechaHoraPublicacionPractica),
         estado: getPractices[i].finalizado === 0 ? "Sin realizar" : "Realizada",
         idCorte: productIndex,
+        recursos: recurso,
       };
       practices.push(practiceInfo);
     }
@@ -1080,17 +1142,6 @@ export async function deletePracticeResource(idPractica) {
         idPracticaPr: idPractica,
       },
     });
-
-    // Verificar si se eliminaron registros
-    if (rowsDeleted > 0) {
-      console.log(
-        `Se eliminaron ${rowsDeleted} registros de la tabla practica_recurso relacionados con la práctica ${idPractica}.`
-      );
-    } else {
-      console.log(
-        `No se encontraron registros para eliminar en la tabla practica_recurso relacionados con la práctica ${idPractica}.`
-      );
-    }
   } catch (error) {
     // Manejar errores
     console.error("Ocurrió un error al eliminar los registros:", error);

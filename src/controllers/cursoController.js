@@ -1,6 +1,6 @@
 import { sequelize } from "../config/database";
 import Curso from "../models/Curso";
-
+import { deletePracticeResourceByPractice } from "./recursoController";
 export async function createCourse(req, res) {
   const { nombreCurso, periodoAcademico } = req.body;
   try {
@@ -134,13 +134,20 @@ export async function deleteCourse(req, res) {
       `select pa.idPractica as idPractica, pa.idCorteP as modulo from practica pa, curso c where pa.idCursoP=c.idCurso and c.idCurso=${idCurso};`,
       { type: sequelize.QueryTypes.SELECT }
     );
+
+    console.log("PRACTICES");
+    console.log(practiceModule);
+
     for (let i = 0; i < practiceModule.length; i++) {
+      await deletePracticeResourceByPractice(practiceModule[i].idPractica);
+
       if (practiceModule[i].modulo === 2) {
         await sequelize.query(
           `delete subgrupo from subgrupo, subgrupo_producto, producto_corte_2, grupo_estudiante, grupo, practica where subgrupo.idSubgrupo=subgrupo_producto.idSubgrupoSP and subgrupo_producto.idProductoC2SP=producto_corte_2.idProductoC2 and producto_corte_2.idGrupoEstudiantePC2=grupo_estudiante.idGrupoEstudiante and grupo_estudiante.idGrupoGE=grupo.idGrupo and grupo.idPracticaG=practica.idPractica and practica.idPractica=${practiceModule[i].idPractica}`
         );
       }
     }
+    console.log("DESTROY COURSE");
     await Curso.destroy({
       where: { idCurso },
     });

@@ -13,7 +13,7 @@ const router = Router();
 // Obtiene los documentos y videos
 router.get("/documents", getDocuments);
 router.get("/videos", getVideos);
-router.get("/documents/:idPractica", getDocumentsPractice);
+// router.get("/documents/:idPractica", getDocumentsPractice);
 
 //Actualiza la url de un video
 router.put(

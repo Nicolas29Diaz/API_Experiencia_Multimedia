@@ -1,6 +1,6 @@
 import express, { json } from "express";
 import morgan from "morgan";
-import cors from "cors";
+// import cors from "cors";
 // Importing routes
 import cursoRoutes from "./routes/curso";
 import profesorRoutes from "./routes/profesor";
@@ -15,7 +15,10 @@ import recursoRoutes from "./routes/recurso";
 // Initializations
 const app = express();
 
+const cors = require('cors');
+
 app.use(cors());
+
 app.use(morgan("dev"));
 app.use(json());
 
@@ -29,6 +32,6 @@ app.use("/api/grupo", grupoRoutes);
 app.use("/api/estudiante", estudianteRoutes);
 app.use("/api/producto", productoRoutes);
 app.use("/api/atributos", atributoRoutes);
-app.use("/api/recursos",recursoRoutes);
+app.use("/api/recursos", recursoRoutes);
 
 export default app;

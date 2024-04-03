@@ -154,7 +154,7 @@ export async function createPractice1(req, res) {
     }
     const idPractica = practica.dataValues.idPractica;
 
-    res.status(200).json({ idPractica: practica.dataValues.idPractica });
+    res.status(200).json({ idPractica });
 
     createPracticeResource(idPractica, idRecursos);
   } catch (error) {
@@ -647,7 +647,7 @@ from atributo a, producto_atributo_1 pa1, producto_corte_1 p, grupo_estudiante g
 where a.idAtributo=pa1.idAtributoPA1 and pa1.idProductoC1A=p.idProductoC1 and 
       p.idGrupoEstudiantePC1=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and 
       ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} 
-group by g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1, p.toleranciaPC1;
+group by g.idGrupo;
 
       `,
       { type: sequelize.QueryTypes.SELECT }
@@ -744,7 +744,7 @@ group by g.idGrupo, p.nombrePC1, p.unidadesPC1, p.variablePrincipalC1, p.toleran
       populateArrayGroups(actualProduct, newArray);
     }
 
-    console.log(grupos);
+    console.log(grupos[0].productos);
     res.json({ bannerInfo, grupos });
   } catch (error) {
     console.log(error);
@@ -763,46 +763,21 @@ export async function getPractice2InfoTeacher(req, res) {
     const recurso = await getDocumentsPractice(idPractica);
 
     const bannerInfo = await sequelize.query(
-      `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ', ') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=${idPractica} group by 
-      pa.idPractica;`,
+      `select cu.nombreCurso, co.nombreCorte,pa.idPractica, pa.nombrePractica, pa.descripcionPractica, pa.fechaHoraPublicacionPractica, group_concat(gr.nombreGrafico separator ', ') as graficos from curso cu, corte co, grafico_practica gp, grafico gr, practica pa where pa.idCursoP=cu.idCurso and pa.idCorteP=co.idCorte and pa.idPractica=gp.idPracticaGP and gp.idGraficoGP=gr.idGrafico and pa.idPractica=${idPractica} group by pa.idPractica`,
       { type: sequelize.QueryTypes.SELECT }
     );
     bannerInfo[0].recurso = recurso;
     const groupsInfo = await sequelize.query(
-      `SELECT
-      g.idGrupo,
-      COUNT(DISTINCT s.idSubgrupo) AS subgrupos,
-      s.cantidadSubgrupo,
-      p.nombrePC2,
-      p.variablePrincipalC2,
-      p.toleranciaPC2,
-      GROUP_CONCAT(DISTINCT " ", a.nombreAtributo) AS atributos,
-      GROUP_CONCAT(DISTINCT CONCAT(" ", e.nombreEstudiante, " ", e.apellidoEstudiante) SEPARATOR ',') AS estudiantes
-  FROM
-      atributo a,
-      producto_atributo_2 pa2,
-      producto_corte_2 p,
-      subgrupo s,
-      subgrupo_producto sp,
-      grupo_estudiante ge,
-      estudiante e,
-      grupo g,
-      practica pa
-  WHERE
-      a.idAtributo = pa2.idAtributoPA2
-      AND pa2.idProductoC2A = p.idProductoC2
-      AND sp.idSubgrupoSP = s.idSubgrupo
-      AND p.idGrupoEstudiantePC2 = ge.idGrupoEstudiante
-      AND e.idEstudiante = ge.idEstudianteGE
-      AND ge.idGrupoGE = g.idGrupo
-      AND g.idPracticaG = pa.idPractica
-      AND pa.idPractica = ${idPractica}
-  GROUP BY
-      g.idGrupo,
-      s.cantidadSubgrupo,
-      p.nombrePC2,
-      p.variablePrincipalC2,
-      p.toleranciaPC2;  
+      `select g.idGrupo, count(distinct s.idSubgrupo) as subgrupos,s.cantidadSubgrupo, p.nombrePC2, p.variablePrincipalC2,
+      p.toleranciaPC2,group_concat(distinct " ",a.nombreAtributo) as atributos,
+      group_concat( distinct concat(" ",e.nombreEstudiante, " ",e.apellidoEstudiante)separator ',')  as estudiantes
+from atributo a, producto_atributo_2 pa2, producto_corte_2 p,subgrupo s, subgrupo_producto sp, 
+    grupo_estudiante ge, estudiante e,grupo g, practica pa 
+where a.idAtributo=pa2.idAtributoPA2 and 
+    pa2.idProductoC2A=p.idProductoC2 and 
+    sp.idSubgrupoSP= s.idSubgrupo and p.idGrupoEstudiantePC2=ge.idGrupoEstudiante
+    and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and 
+    g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} group by g.idGrupo;  
 `,
       { type: sequelize.QueryTypes.SELECT }
     );
@@ -929,48 +904,14 @@ export async function getPractice3InfoTeacher(req, res) {
     );
     bannerInfo[0].recurso = recurso;
     const groupsInfo = await sequelize.query(
-      `SELECT 
-    g.idGrupo,
-    p.nombrePC3,
-    p.variablePrincipalC3,
-    p.toleranciaPC3,
-    p.tamanioLote,
-    p.aql,
-    p.severidad,
-    p.nivelInspeccion,
-    (CASE WHEN p.tipoMuestreo='atributo' THEN GROUP_CONCAT(DISTINCT a.nombreAtributo SEPARATOR ', ') ELSE 'ninguno' END) AS atributos,
-    (CASE WHEN p.tipoMuestreo='variable' THEN GROUP_CONCAT(DISTINCT m.nombreMetodo SEPARATOR ',') ELSE 'ninguno' END) AS metodos,
-    GROUP_CONCAT(DISTINCT CONCAT(' ', e.nombreEstudiante, ' ', e.apellidoEstudiante) SEPARATOR ',') AS estudiantes 
-FROM 
-    metodo m,
-    metodo_producto mp,
-    atributo a,
-    producto_atributo_3 pa3,
-    producto_corte_3 p,
-    grupo_estudiante ge,
-    estudiante e,
-    grupo g,
-    practica pa 
-WHERE 
-    m.idMetodo=mp.idMetodoMP AND 
-    mp.idProductoMP=p.idProductoC3 AND 
-    a.idAtributo=pa3.idAtributoPA3 AND 
-    pa3.idProductoC3A=p.idProductoC3 AND 
-    p.idGrupoEstudiantePC3=ge.idGrupoEstudiante AND 
-    e.idEstudiante=ge.idEstudianteGE AND 
-    ge.idGrupoGE=g.idGrupo AND 
-    g.idPracticaG=pa.idPractica AND 
-    pa.idPractica=${idPractica}
-GROUP BY 
-    g.idGrupo, 
-    p.nombrePC3, 
-    p.variablePrincipalC3, 
-    p.toleranciaPC3, 
-    p.tamanioLote, 
-    p.aql, 
-    p.severidad, 
-    p.nivelInspeccion,
-    p.tipoMuestreo;
+      `select g.idGrupo,p.nombrePC3, p.variablePrincipalC3, p.toleranciaPC3, p.tamanioLote, p.aql,p.severidad, p.nivelInspeccion,
+      (case when p.tipoMuestreo='atributo' then group_concat(distinct a.nombreAtributo separator ', ')  else "ninguno" end) as atributos,
+      (case when p.tipoMuestreo='variable' then group_concat(distinct m.nombreMetodo separator ',')  else "ninguno" end) as metodos,
+      group_concat( distinct concat(" ",e.nombreEstudiante ," ",e.apellidoEstudiante)separator ',') as estudiantes 
+      from metodo m, metodo_producto mp, atributo a, producto_atributo_3 pa3, producto_corte_3 p,grupo_estudiante ge,
+      estudiante e,grupo g, practica pa where m.idMetodo=mp.idMetodoMP and mp.idProductoMP=p.idProductoC3 and a.idAtributo=pa3.idAtributoPA3 and pa3.idProductoC3A=p.idProductoC3 and 
+      p.idGrupoEstudiantePC3=ge.idGrupoEstudiante and e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and 
+      g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica}  group by g.idGrupo; ;
 `,
       { type: sequelize.QueryTypes.SELECT }
     );

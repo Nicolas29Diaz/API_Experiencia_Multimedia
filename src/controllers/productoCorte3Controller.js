@@ -367,21 +367,30 @@ export async function getFeaturesC3(req, res) {
 }
 
 export async function updateProductsState(req, res) {
+  console.log("UPDATE");
   try {
     const { idEstudiante, idPractica } = req.params;
+    console.log("idPractica:");
+    console.log(idPractica);
+    console.log("idEstudiante: ");
+    console.log(idEstudiante);
+    const isPracticeExist = await Practica.findOne({
+      where: { idPractica: idPractica },
+    });
 
-    const isPracticeExist = Practica.findOne({ where: idPractica });
+    console.log("isPracticeExist");
 
     if (!isPracticeExist) {
       return res.status(404).json({ msg: "La práctica no existe" });
     }
 
-    const isStudentExist = sequelize.query(
+    const isStudentExist = await sequelize.query(
       `
     select e.idEstudiante from estudiante e, grupo_estudiante ge, grupo g, practica pa where e.idEstudiante=ge.idEstudianteGE and ge.idGrupoGE=g.idGrupo and g.idPracticaG=pa.idPractica and pa.idPractica=${idPractica} and e.idEstudiante=${idEstudiante};
     `,
       { type: sequelize.QueryTypes.SELECT }
     );
+    console.log("isStudentExist");
 
     if (!isStudentExist) {
       return res.status(401).json({ msg: "No autorizado" });
@@ -398,6 +407,7 @@ export async function updateProductsState(req, res) {
         }
       );
     }
+    console.log("accepted");
 
     for (let j = 0; j < rejected.length; j++) {
       await ProductoCorte3.update(
@@ -409,7 +419,7 @@ export async function updateProductsState(req, res) {
         }
       );
     }
-
+    console.log("rejected");
     res.json({ msg: "Datos guardados con éxito" });
   } catch (error) {
     res.status(500).json({ msg: "Hubo un error al guardar los datos" });

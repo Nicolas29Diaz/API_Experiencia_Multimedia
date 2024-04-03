@@ -44,7 +44,7 @@ export async function updateVideo(req, res) {
   try {
     const { nombreRecurso } = req.params;
     const { urlRecurso } = req.body;
-
+    console.log(urlRecurso);
     // Verificar si el recurso existe
     const existeRecurso = await Recurso.findOne({
       where: { nombreRecurso: nombreRecurso },

@@ -144,6 +144,24 @@ export async function deleteStudent(req, res) {
   try {
     const idEstudiante = req.params.idEstudiante;
 
+    const idSubgrupos = await sequelize.query(
+      `select s.idSubgrupo from
+      grupo_estudiante ge,
+      producto_corte_2 pc2,
+      subgrupo_producto	sp,
+      subgrupo s Where
+      s.idSubgrupo = sp.idSubgrupoSP and
+      sp.idProductoC2SP = pc2.idProductoC2 and
+       pc2.idGrupoEstudiantePC2 = ge.idGrupoEstudiante and
+      ge.idEstudianteGE = ${idEstudiante};`
+    );
+
+    for (const subgrupo of idSubgrupos[0]) {
+      const rowsDeleted = await sequelize.query(
+        `DELETE FROM subgrupo WHERE idSubgrupo = '${subgrupo.idSubgrupo}';`
+      );
+    }
+
     const rowsDeleted = await sequelize.query(
       `DELETE FROM estudiante WHERE idEstudiante = '${idEstudiante}';`
     );
@@ -156,8 +174,9 @@ export async function deleteStudent(req, res) {
 
 export async function deleteAllStudents(req, res) {
   try {
-    
     await sequelize.query(`DELETE FROM estudiante;`);
+
+    await sequelize.query(`DELETE FROM subgrupo;`);
 
     res.json({ msg: "Estudiantes eliminados" });
   } catch (error) {

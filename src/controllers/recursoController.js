@@ -2,6 +2,12 @@ import Recurso from "../models/Recurso";
 import PracticaRecurso from "../models/Practica_Recurso";
 import { sequelize } from "../config/database";
 
+/**
+ * Obtiene todos los documentos disponibles.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ * @returns {Object[]} - Array de documentos.
+ */
 export async function getDocuments(req, res) {
   try {
     const recurso = await Recurso.findAll({
@@ -13,7 +19,12 @@ export async function getDocuments(req, res) {
     console.log(error);
   }
 }
-
+/**
+ * Obtiene todos los videos disponibles.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ * @returns {Object[]} - Array de videos.
+ */
 export async function getVideos(req, res) {
   try {
     const recurso = await Recurso.findAll({
@@ -25,7 +36,11 @@ export async function getVideos(req, res) {
     console.log(error);
   }
 }
-
+/**
+ * Obtiene todos los documentos asociados a una práctica específica.
+ * @param {number} idPractica - ID de la práctica.
+ * @returns {Object[]} - Array de documentos asociados a la práctica.
+ */
 export async function getDocumentsPractice(idPractica) {
   try {
     const documentos = await sequelize.query(
@@ -39,7 +54,11 @@ export async function getDocumentsPractice(idPractica) {
     console.log(error);
   }
 }
-
+/**
+ * Actualiza la URL de un video.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 export async function updateVideo(req, res) {
   try {
     const { nombreRecurso } = req.params;
@@ -64,14 +83,18 @@ export async function updateVideo(req, res) {
       nombreRecurso,
       urlRecurso,
     };
-
+    //
     res.json({ recurso });
   } catch (error) {
     res.status(500).json({ msg: "Hubo un error" });
     console.log(error);
   }
 }
-
+/**
+ * Sube un nuevo documento.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 export async function postDocument(req, res) {
   const { urlRecurso, nombreRecurso } = req.body;
   try {
@@ -89,7 +112,11 @@ export async function postDocument(req, res) {
     res.status(500).json({ msg: "Hubo un problema al crear el recurso" });
   }
 }
-
+/**
+ * Elimina un documento existente.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 export async function deletePracticeResource(idRecurso) {
   try {
     // Eliminar los registros en la tabla practica_recurso que coincidan con idRecurso
@@ -115,6 +142,11 @@ export async function deletePracticeResource(idRecurso) {
     throw error; // Re-lanza el error para que sea manejado en un nivel superior si es necesario
   }
 }
+
+/**
+ * Elimina los registros de recursos asociados a una práctica específica.
+ * @param {number} idPractica - ID de la práctica.
+ */
 export async function deletePracticeResourceByPractice(idPractica) {
   try {
     // Eliminar los registros en la tabla practica_recurso que coincidan con idPractica
@@ -140,6 +172,11 @@ export async function deletePracticeResourceByPractice(idPractica) {
     throw error; // Re-lanza el error para que sea manejado en un nivel superior si es necesario
   }
 }
+/**
+ * Elimina un documento existente y sus asociaciones.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 export async function deleteDocument(req, res) {
   try {
     //PRIMERO BORRAR DE PRACTICA_RECURSO

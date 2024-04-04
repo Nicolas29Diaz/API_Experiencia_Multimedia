@@ -10,12 +10,32 @@ import { Router } from "express";
 import { verifyUser, permitirSoloProfesor } from "../middleware/auth";
 const router = Router();
 
-// Obtiene los documentos y videos
+/**
+ * Obtiene todos los documentos disponibles.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 router.get("/documents", getDocuments);
-router.get("/videos", getVideos);
-// router.get("/documents/:idPractica", getDocumentsPractice);
 
-//Actualiza la url de un video
+/**
+ * Obtiene todos los documentos disponibles en una practica.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
+router.get("/documents/:idPractica", getDocumentsPractice);
+
+/**
+ * Obtiene todos los videos disponibles.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
+router.get("/videos", getVideos);
+
+/**
+ * Actualiza la URL de un video.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 router.put(
   "/videos/:nombreRecurso",
   verifyUser,
@@ -23,10 +43,18 @@ router.put(
   updateVideo
 );
 
-//Sube un documento
+/**
+ * Sube un nuevo documento.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 router.post("/documents", verifyUser, permitirSoloProfesor, postDocument);
 
-//Elimina un documento
+/**
+ * Elimina un documento existente.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 router.delete(
   "/documents/:idRecurso",
   verifyUser,

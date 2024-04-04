@@ -185,6 +185,7 @@ export async function createPractice2(req, res) {
 
     const getGraphics = graficos.map((grafico) => grafico.value);
 
+    //ANTES
     let countRandom = 1;
     let countConstant = 1;
     let countVariable = 1;
@@ -215,9 +216,10 @@ export async function createPractice2(req, res) {
         { fields: ["idPracticaGP", "idGraficoGP"] }
       );
     }
-
+    console.log("groups");
+    console.log(groups);
     for (let i = 0; i < groups.length; i++) {
-      const {
+      let {
         producto,
         subgrupo,
         tamanioSubgrupo,
@@ -226,6 +228,15 @@ export async function createPractice2(req, res) {
         cont,
         atributos,
       } = groups[i];
+      console.log("subgrupo");
+
+      //AHORA
+      // let countRandom = 1;
+      // let countConstant = 1;
+      // let countVariable = 1;
+
+      // subgrupo = parseInt(subgrupo);
+      console.log(subgrupo);
       const nombreGrupo = `Grupo ${i + 1}`;
 
       const grupo = await Grupo.create(
@@ -237,6 +248,11 @@ export async function createPractice2(req, res) {
       );
 
       for (let j = 0; j < integrantes.length; j++) {
+        // Reiniciar las variables para cada estudiante
+        let countRandom = 1;
+        let countConstant = 1;
+        let countVariable = 1;
+
         const grupoEstudiante = await GrupoEstudiante.create(
           {
             idGrupoGE: grupo.dataValues.idGrupo,

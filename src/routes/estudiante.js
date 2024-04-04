@@ -37,10 +37,17 @@ router.get(
   getStudentPracticeState
 );
 
+/**
+ * Elimina un estudiante.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 router.delete("/:idEstudiante", verifyUser, deleteStudent);
-router.delete(
-  "/",
-  verifyUser,
-  deleteAllStudents
-);
+/**
+ * Elimina todos los estudiantes.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
+
+router.delete("/", verifyUser, deleteAllStudents);
 export default router;

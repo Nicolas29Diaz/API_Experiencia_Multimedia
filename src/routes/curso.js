@@ -17,7 +17,7 @@ const router = Router();
 // /api/cursos
 
 // Inserciones
-router.post("/", verifyUser, permitirSoloProfesor, createCourse);
+router.post("/", verifyUser, createCourse);
 
 // Consultas
 router.get("/", verifyUser, getAllCourses);
@@ -36,9 +36,8 @@ router.get("/curso/:idCurso", getCourseStudent);
 router.delete(
   "/curso/:idCurso",
   verifyUser,
-  permitirSoloProfesor,
   deleteCourse
 );
 // actualizar curso
-router.put("/curso/:idCurso", verifyUser, permitirSoloProfesor, updateCourse);
+router.put("/curso/:idCurso", verifyUser, updateCourse);
 export default router;

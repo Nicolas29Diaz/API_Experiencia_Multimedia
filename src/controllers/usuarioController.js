@@ -4,6 +4,11 @@ import jwt from "jsonwebtoken";
 import { hashedPassword } from "../helpers";
 import { sequelize } from "../config/database";
 
+/**
+ * Registra un nuevo usuario.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 export async function registerUser(req, res) {
   try {
     const { firstname, lastname, email, password, role } = req.body;
@@ -123,6 +128,11 @@ export async function registerUser(req, res) {
   }
 }
 
+/**
+ * Registra varios usuarios a la vez.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 export async function registerUsers(req, res) {
   const studentsArray = req.body;
   console.log(req.body);

@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
 import Practica from "./Practica"; // Importa el modelo de la tabla "practica"
 import Recurso from "./Recurso"; // Importa el modelo de la tabla "recurso"
-
+//
 const PracticaRecurso = sequelize.define(
   "practica_recurso",
   {

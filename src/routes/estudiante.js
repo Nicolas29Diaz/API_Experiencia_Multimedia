@@ -7,6 +7,8 @@ import {
   updatePracticeState,
   getStudentPracticeState,
   getAllStudentsAllData,
+  deleteStudent,
+  deleteAllStudents,
 } from "../controllers/estudianteController";
 import { verifyUser } from "../middleware/auth";
 const router = Router();
@@ -35,5 +37,17 @@ router.get(
   getStudentPracticeState
 );
 
+/**
+ * Elimina un estudiante.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
+router.delete("/:idEstudiante", verifyUser, deleteStudent);
+/**
+ * Elimina todos los estudiantes.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 
+router.delete("/", verifyUser, deleteAllStudents);
 export default router;

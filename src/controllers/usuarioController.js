@@ -2,7 +2,13 @@ import Estudiante from "../models/Estudiante";
 import Profesor from "../models/Profesor";
 import jwt from "jsonwebtoken";
 import { hashedPassword } from "../helpers";
+import { sequelize } from "../config/database";
 
+/**
+ * Registra un nuevo usuario.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
 export async function registerUser(req, res) {
   try {
     const { firstname, lastname, email, password, role } = req.body;
@@ -119,5 +125,45 @@ export async function registerUser(req, res) {
   } catch (error) {
     res.status(500).json("Hubo un error");
     console.log(error);
+  }
+}
+
+/**
+ * Registra varios usuarios a la vez.
+ * @param {*} req - Solicitud HTTP.
+ * @param {*} res - Respuesta HTTP.
+ */
+export async function registerUsers(req, res) {
+  const studentsArray = req.body;
+  console.log(req.body);
+  const bulkData = [];
+  // Construir el array de datos para la inserción masiva
+  for (const student of studentsArray) {
+    const passwordHashed = await hashedPassword(student.password);
+    bulkData.push({
+      idEstudiante: student.id,
+      nombreEstudiante: student.firstname,
+      apellidoEstudiante: student.lastname,
+      emailEstudiante: student.email,
+      contrasenaEstudiante: passwordHashed,
+    });
+  }
+  let response = null;
+  // console.log(bulkData);
+  try {
+    // Iniciar una transacción
+    await sequelize.transaction(async (t) => {
+      // Realizar la inserción masiva
+      response = await Estudiante.bulkCreate(bulkData, {
+        transaction: t,
+      });
+    });
+
+    // Enviar respuesta de éxito
+    res.json({ response });
+  } catch (error) {
+    // Manejar cualquier error que ocurra durante la inserción
+    console.error("Error al insertar estudiantes:", error);
+    res.status(500).json({ msg: "Hubo un error al registrar los estudiantes" });
   }
 }

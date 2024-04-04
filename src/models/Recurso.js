@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
- 
+ //
 const Recurso = sequelize.define(
   "recurso",
   {

@@ -47,7 +47,7 @@ router.get("/corte1", getAllProductsC1);
 /** Ruta para obtener los productos de inspección */
 router.get(
   "/corte1/inspeccion/:idPractica/estudiante/:idEstudiante",
-  verifyUser,
+  // verifyUser,
   getPracticeOneProductInfoPerStudent
 );
 
@@ -74,7 +74,7 @@ router.get("/corte2/graficos/:idPractica/", verifyUser, getGraphicsByPractice);
 /** Ruta para obtener los productos de inspección */
 router.get(
   "/corte2/inspeccion/:idPractica/estudiante/:idEstudiante/subgrupo",
-  verifyUser,
+  // verifyUser,
   getProductInfoPerSubgroupAndStudent
 );
 
@@ -95,7 +95,7 @@ router.get(
 
 router.get(
   "/corte3/inspeccion/:idPractica/estudiante/:idEstudiante",
-  verifyUser,
+  // verifyUser,
   getPracticeThreeProductInfoPerStudent
 );
 

@@ -12,6 +12,11 @@ import {
 } from "../constants/index";
 
 export function getModels(productName, atributos) {
+  console.log("productName");
+  console.log(productName);
+  console.log("atributos");
+  console.log(atributos);
+
   const nameProducts = {
     [REFRESCOS]: refrescoModels(atributos),
     [BOLSA_ARROZ]: bolsaArrozModels(atributos),
@@ -19,6 +24,6 @@ export function getModels(productName, atributos) {
     [BARRA_JABON]: barraJabonModels(atributos),
     [PITILLOS]: pitillosModels(atributos),
   };
-
+  console.log(nameProducts[productName]);
   return nameProducts[productName];
 }

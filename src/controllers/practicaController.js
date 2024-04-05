@@ -806,17 +806,40 @@ where a.idAtributo=pa2.idAtributoPA2 and
     let chocolateArray = [];
     let pitillosArray = [];
 
+    // console.log(groupsInfo);
+
     for (let i = 0; i < groupsInfo.length; i++) {
       const {
         idGrupo,
-        subgrupos,
-        cantidadSubgrupo,
         nombrePC2,
         variablePrincipalC2,
         toleranciaPC2,
         atributos,
         estudiantes,
       } = groupsInfo[i];
+      //PRIMERO agarrar los estudiantes de cada grupo
+      const idEstudiante = await sequelize.query(
+        `SELECT e.idEstudiante FROM
+        grupo_estudiante ge, estudiante e 
+        WHERE
+        ge.idEstudianteGE = e.idEstudiante
+        and ge.idGrupoGE = ${idGrupo}`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+      //SEGUNDO agarrar los subgrupos del primer estudante del grupo
+      const getOneSubGroup = await sequelize.query(
+        `select  count(distinct s.idSubgrupo) as subgrupos,
+        s.cantidadSubgrupo
+        FROM grupo g, grupo_estudiante ge, producto_corte_2 pc2,
+        subgrupo_producto sp, subgrupo s where
+        s.idSubgrupo = sp.idSubgrupoSP and
+        sp.idProductoC2SP = pc2.idProductoC2 and
+        pc2.idGrupoEstudiantePC2 = ge.idGrupoEstudiante and
+        ge.idGrupoGE = g.idGrupo and
+        g.idPracticaG = ${idPractica} and ge.idEstudianteGE = ${idEstudiante[0].idEstudiante}
+        group by ge.idGrupoGE, ge.idEstudianteGE `,
+        { type: sequelize.QueryTypes.SELECT }
+      );
 
       getGroupStatus = await sequelize.query(
         `select ge.finalizado from grupo_estudiante ge, grupo g, practica pa where pa.idPractica=g.idPracticaG and g.idGrupo=ge.idGrupoGE and g.idGrupo=${idGrupo} and pa.idPractica=${idPractica};`,
@@ -831,8 +854,8 @@ where a.idAtributo=pa2.idAtributoPA2 and
         idGrupo,
         nombreProducto: nombrePC2,
         infoSubgs: {
-          subgrupos,
-          cantidadSubgrupo,
+          subgrupos: getOneSubGroup[0].subgrupos, //Poner el subgrupo del primer estudiante
+          cantidadSubgrupo: getOneSubGroup[0].cantidadSubgrupo, //Poner la cantidadSubgrupo del primer estudiante
         },
         info: {
           variable: `${variablePrincipalC2} ${PRODUCT_UNITS[nombrePC2]}`,
@@ -896,7 +919,10 @@ where a.idAtributo=pa2.idAtributoPA2 and
     } else {
       // console.log("NADA");
     }
-
+    // console.log("Grupos")
+    // console.log(grupos[0].productos);
+    // console.log("FinGrupos")
+    // grupos
     res.json({ bannerInfo, grupos });
   } catch (error) {
     console.log(error);
